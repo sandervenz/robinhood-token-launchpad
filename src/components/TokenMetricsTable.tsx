@@ -1,6 +1,6 @@
 'use client';
 
-import { useTokenData } from '@/hooks/useTokenData';
+import { useTokens } from '@/context/TokenContext';
 import { robinhoodTestnet } from '@/config/chain';
 import { TokenPhase } from '@/types/token';
 import { 
@@ -17,7 +17,7 @@ import {
 import { formatEther } from 'viem';
 
 export function TokenMetricsTable() {
-  const { tokens, isLoading, isRefreshing, isError, error, refetch } = useTokenData();
+  const { tokens, isLoading, isRefreshing, isError, error, refetchTokens: refetch } = useTokens();
 
   const truncate = (str: string) => `${str.slice(0, 6)}...${str.slice(-4)}`;
 

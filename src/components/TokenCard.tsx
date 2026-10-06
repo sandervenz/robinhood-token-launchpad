@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useAccount, useReadContract } from 'wagmi';
 import { TokenData } from '@/types/token';
 import { StatusBadge } from './StatusBadge';
 import { robinhoodTestnet } from '@/config/chain';
+import { LAUNCHER_TOKEN_ABI } from '@/config/contracts';
 import { 
   ArrowUpRight, 
   ExternalLink, 
@@ -11,12 +13,15 @@ import {
   Check, 
   Lock, 
   TrendingUp,
-  Coins
+  Coins,
+  Zap,
+  Sparkles
 } from 'lucide-react';
-import { formatEther } from 'viem';
+import { formatEther, Address } from 'viem';
 
 interface TokenCardProps {
   token: TokenData;
+  isHighlighted?: boolean;
   onSelectBuy?: (token: TokenData) => void;
 }
 
@@ -27,9 +32,22 @@ function getAvatarGradient(address: string) {
   return `linear-gradient(135deg, ${color1}40 0%, #0d111a 100%)`;
 }
 
-export function TokenCard({ token, onSelectBuy }: TokenCardProps) {
+export function TokenCard({ token, isHighlighted = false, onSelectBuy }: TokenCardProps) {
+  const { address } = useAccount();
   const [copied, setCopied] = useState(false);
   const [imgError, setImgError] = useState(false);
+
+  // Read user token balance for real-time reactive feedback on the list
+  const { data: userBalance } = useReadContract({
+    address: token.token as Address,
+    abi: LAUNCHER_TOKEN_ABI,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    chainId: robinhoodTestnet.id,
+    query: {
+      enabled: !!address,
+    },
+  });
 
   const truncate = (str: string) => `${str.slice(0, 6)}...${str.slice(-4)}`;
 
@@ -42,10 +60,33 @@ export function TokenCard({ token, onSelectBuy }: TokenCardProps) {
 
   const isBuyDisabled = token.phase !== 0;
 
+  const hasHoldings = typeof userBalance === 'bigint' && userBalance > BigInt(0);
+  const userBalanceFormatted = hasHoldings
+    ? parseFloat(formatEther(userBalance)).toLocaleString(undefined, { maximumFractionDigits: 2 })
+    : '0';
+
   return (
-    <div className="group glass-card rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/30 flex flex-col justify-between relative overflow-hidden">
-      {/* Background radial glow on hover */}
-      <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/15 transition-all duration-500" />
+    <div 
+      className={`group glass-card rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between relative overflow-hidden ${
+        isHighlighted 
+          ? 'border-emerald-400 shadow-xl shadow-emerald-500/20 ring-1 ring-emerald-400/50' 
+          : 'hover:border-blue-500/30'
+      }`}
+    >
+      {/* Background radial glow */}
+      <div 
+        className={`absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl pointer-events-none transition-all duration-500 ${
+          isHighlighted ? 'bg-emerald-500/25' : 'bg-blue-500/10 group-hover:bg-blue-500/15'
+        }`} 
+      />
+
+      {/* Top Notification Badge if just purchased */}
+      {isHighlighted && (
+        <div className="absolute top-2 right-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/40 animate-pulse z-10">
+          <Zap className="w-3 h-3 text-emerald-400" />
+          <span>Metrics Updated!</span>
+        </div>
+      )}
 
       {/* Top Row: Avatar + Ticker & Status Badge */}
       <div>
@@ -97,8 +138,18 @@ export function TokenCard({ token, onSelectBuy }: TokenCardProps) {
           <StatusBadge phase={token.phase} />
         </div>
 
+        {/* User holdings pill if owned */}
+        {hasHoldings && (
+          <div className="mb-3 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-[11px]">
+            <span className="text-emerald-300 font-medium">Your Holdings:</span>
+            <span className="font-mono font-bold text-white">
+              {userBalanceFormatted} ${token.symbol}
+            </span>
+          </div>
+        )}
+
         {/* Spot Price Display */}
-        <div className="my-4 p-3.5 rounded-xl bg-[#08090C]/80 border border-white/5">
+        <div className="my-3 p-3.5 rounded-xl bg-[#08090C]/80 border border-white/5">
           <div className="flex items-center justify-between text-xs text-[#8F96A3] mb-1">
             <span className="flex items-center gap-1">
               <TrendingUp className="w-3 h-3 text-blue-400" />
