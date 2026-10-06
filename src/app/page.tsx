@@ -2,8 +2,9 @@
 
 import { Navbar } from '@/components/Navbar';
 import { NetworkAlert } from '@/components/NetworkAlert';
-import { WalletStatusCard } from '@/components/WalletStatusCard';
+import { TokenMetricsTable } from '@/components/TokenMetricsTable';
 import { TokenDiscoveryTable } from '@/components/TokenDiscoveryTable';
+import { WalletStatusCard } from '@/components/WalletStatusCard';
 import { useLaunchFee } from '@/hooks/useLaunchFee';
 import { 
   LAUNCH_FACTORY_ADDRESS, 
@@ -28,8 +29,8 @@ export default function Home() {
 
           {/* Pill Badge */}
           <div className="inline-flex items-center gap-2 glass-pill px-4 py-1.5 text-xs text-[#8F96A3] mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-            <span>Robinhood Chain Testnet • Step 3 Initialized</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+            <span>Robinhood Chain Testnet • Step 4 Complete</span>
           </div>
 
           {/* Heading */}
@@ -45,7 +46,10 @@ export default function Home() {
             Fair token launches with zero initial liquidity required. Every token is traded on an automated bonding curve until reaching graduation threshold for Uniswap v4.
           </p>
 
-          {/* Step 3: Token Discovery from Logs Table */}
+          {/* Step 4: Full Token Metrics Table (Multicall3 aggregated) */}
+          <TokenMetricsTable />
+
+          {/* Step 3: Raw Event Logs Discovery Table */}
           <TokenDiscoveryTable />
 
           {/* Step 2: Wallet Connection & Balance Card */}
@@ -145,7 +149,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="w-full border-t border-white/5 py-6 px-4 text-center text-xs text-[#8F96A3]">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span>Cointinental Launchpad — Robinhood Chain Testnet (Phase 3 Completed)</span>
+          <span>Cointinental Launchpad — Robinhood Chain Testnet (Phase 4 Completed)</span>
           <div className="flex items-center gap-4 text-[11px]">
             <span>Next.js 15+</span>
             <span>•</span>
