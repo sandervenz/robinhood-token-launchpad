@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { NetworkAlert } from '@/components/NetworkAlert';
 import { TokenList } from '@/components/TokenList';
+import { BuyModal } from '@/components/BuyModal';
 import { TokenMetricsTable } from '@/components/TokenMetricsTable';
 import { TokenDiscoveryTable } from '@/components/TokenDiscoveryTable';
 import { WalletStatusCard } from '@/components/WalletStatusCard';
@@ -88,6 +89,13 @@ export default function Home() {
 
         {/* CORE FEATURE: TOKEN LIST (CARDS GRID & FILTERS) */}
         <TokenList onSelectBuy={(token) => setSelectedTokenForBuy(token)} />
+
+        {/* STEP 6: BUY MODAL FORM */}
+        <BuyModal
+          token={selectedTokenForBuy}
+          isOpen={!!selectedTokenForBuy}
+          onClose={() => setSelectedTokenForBuy(null)}
+        />
 
         {/* TECHNICAL AUDIT & INTERVIEW DIAGNOSTICS ACCORDION */}
         <div className="mt-16 pt-8 border-t border-white/10">

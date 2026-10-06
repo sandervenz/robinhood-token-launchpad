@@ -33,7 +33,7 @@ export function useTokenData() {
     setError(null);
 
     try {
-      // Siapkan panggilan batch multicall untuk seluruh token (7 calls per token)
+      // Siapkan panggilan batch multicall untuk seluruh token (9 calls per token)
       const contracts: any[] = [];
 
       for (const t of tokenEvents) {
@@ -50,7 +50,11 @@ export function useTokenData() {
           { address: t.curve, abi: BONDING_CURVE_ABI, functionName: 'realQuoteReserve' },
           // 5: Curve Graduation Threshold
           { address: t.curve, abi: BONDING_CURVE_ABI, functionName: 'graduationThreshold' },
-          // 6: Factory LaunchedToken Struct (menghasilkan phase)
+          // 6: Curve Fee Bps
+          { address: t.curve, abi: BONDING_CURVE_ABI, functionName: 'feeBps' },
+          // 7: Curve Creator Tax Bps
+          { address: t.curve, abi: BONDING_CURVE_ABI, functionName: 'creatorTaxBps' },
+          // 8: Factory LaunchedToken Struct (menghasilkan phase)
           { address: LAUNCH_FACTORY_ADDRESS, abi: LAUNCH_FACTORY_ABI, functionName: 'getLaunchedToken', args: [t.token] }
         );
       }
@@ -62,7 +66,7 @@ export function useTokenData() {
       });
 
       const updatedTokens: TokenData[] = [];
-      const CALLS_PER_TOKEN = 7;
+      const CALLS_PER_TOKEN = 9;
 
       for (let i = 0; i < tokenEvents.length; i++) {
         const baseIdx = i * CALLS_PER_TOKEN;
@@ -74,7 +78,9 @@ export function useTokenData() {
         const reservesRes = results[baseIdx + 3];
         const realQuoteRes = results[baseIdx + 4];
         const thresholdRes = results[baseIdx + 5];
-        const factoryRes = results[baseIdx + 6];
+        const feeBpsRes = results[baseIdx + 6];
+        const creatorTaxBpsRes = results[baseIdx + 7];
+        const factoryRes = results[baseIdx + 8];
 
         const name = (nameRes?.status === 'success' && typeof nameRes.result === 'string') 
           ? nameRes.result 
@@ -103,6 +109,14 @@ export function useTokenData() {
           ? thresholdRes.result
           : t.graduationThreshold;
 
+        const feeBps = (feeBpsRes?.status === 'success' && (typeof feeBpsRes.result === 'bigint' || typeof feeBpsRes.result === 'number'))
+          ? BigInt(feeBpsRes.result)
+          : BigInt(100);
+
+        const creatorTaxBps = (creatorTaxBpsRes?.status === 'success' && (typeof creatorTaxBpsRes.result === 'bigint' || typeof creatorTaxBpsRes.result === 'number'))
+          ? BigInt(creatorTaxBpsRes.result)
+          : BigInt(0);
+
         let phase: TokenPhase = 0;
         if (factoryRes?.status === 'success' && factoryRes.result && typeof (factoryRes.result as any).phase === 'number') {
           phase = (factoryRes.result as any).phase as TokenPhase;
@@ -122,6 +136,8 @@ export function useTokenData() {
           realQuoteReserve,
           graduationThreshold,
           phase,
+          feeBps,
+          creatorTaxBps,
           spotPriceEth,
           graduationProgressBps: bps,
           graduationProgressPercent: percent,
