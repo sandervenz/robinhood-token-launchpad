@@ -1,26 +1,88 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #08090C;
+  --foreground: #FFFFFF;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #08090C;
+  color: #FFFFFF;
+  min-height: 100vh;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  overflow-x: hidden;
+}
+
+/* Cosmic background atmosphere */
+.cosmic-bg {
+  background-color: #08090C;
+  background-image: 
+    radial-gradient(circle at 50% 20%, rgba(56, 125, 255, 0.18) 0%, rgba(13, 15, 22, 0.6) 45%, #08090C 80%),
+    radial-gradient(circle at 85% 10%, rgba(90, 160, 255, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 15% 40%, rgba(56, 125, 255, 0.05) 0%, transparent 50%);
+}
+
+/* Glassmorphism pill & card styles */
+.glass-pill {
+  background: rgba(18, 22, 33, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+}
+
+.glass-card {
+  background: rgba(18, 22, 33, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card:hover {
+  border-color: rgba(104, 157, 248, 0.3);
+  box-shadow: 0 10px 30px -10px rgba(56, 125, 255, 0.15);
+}
+
+/* Primary Cointinental Glow Button */
+.btn-primary-glow {
+  background: linear-gradient(135deg, #b0cdff 0%, #689df8 100%);
+  color: #08090C;
+  font-weight: 600;
+  border-radius: 9999px;
+  box-shadow: 0 4px 20px rgba(104, 157, 248, 0.35);
+  transition: all 0.25s ease;
+}
+
+.btn-primary-glow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(104, 157, 248, 0.5);
+}
+
+/* Secondary Outline Button */
+.btn-secondary-outline {
+  background: rgba(18, 22, 33, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  color: #FFFFFF;
+  transition: all 0.25s ease;
+}
+
+.btn-secondary-outline:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #08090C;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }

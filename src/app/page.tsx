@@ -1,69 +1,153 @@
-import Image from "next/image";
+'use client';
+
+import { Navbar } from '@/components/Navbar';
+import { useLaunchFee } from '@/hooks/useLaunchFee';
+import { 
+  LAUNCH_FACTORY_ADDRESS, 
+  MULTICALL3_ADDRESS, 
+  FACTORY_DEPLOY_BLOCK 
+} from '@/config/contracts';
+import { robinhoodTestnet } from '@/config/chain';
+import { ArrowUpRight, Cpu, Layers, Shield, Zap, CheckCircle2 } from 'lucide-react';
 
 export default function Home() {
+  const { feeFormatted, feeWei, isLoading, isError, error, refetch } = useLaunchFee();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div className="min-h-screen cosmic-bg flex flex-col selection:bg-blue-500/30">
+      <Navbar />
+
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-10 flex flex-col justify-between">
+        {/* Hero Section */}
+        <div className="relative my-auto flex flex-col items-center text-center py-12">
+          {/* Subtle Glow Behind Hero */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-blue-500/15 blur-[120px] rounded-full pointer-events-none" />
+
+          {/* Pill Badge */}
+          <div className="inline-flex items-center gap-2 glass-pill px-4 py-1.5 text-xs text-[#8F96A3] mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            <span>Robinhood Chain Testnet • Step 1 Initialized</span>
+          </div>
+
+          {/* Heading */}
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-4xl leading-[1.1] mb-6">
+            The Algorithmic <br />
+            <span className="bg-gradient-to-r from-white via-[#b0cdff] to-[#689df8] bg-clip-text text-transparent">
+              Bonding Curve Launchpad
+            </span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          {/* Subtitle */}
+          <p className="text-base sm:text-lg text-[#8F96A3] max-w-2xl mb-10 leading-relaxed">
+            Fair token launches with zero initial liquidity required. Every token is traded on an automated bonding curve until reaching graduation threshold for Uniswap v4.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+          {/* Step 1 Completion Feature Card (Launch Fee Verified) */}
+          <div className="w-full max-w-3xl glass-card rounded-2xl p-6 sm:p-8 relative overflow-hidden text-left mb-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white">Smart Contract Setup & Verification</h2>
+                  <p className="text-xs text-[#8F96A3]">Step 1 — Reading live factory state from Robinhood Chain Testnet</p>
+                </div>
+              </div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold self-start sm:self-auto">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Connected to Testnet</span>
+              </div>
+            </div>
+
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-6">
+              {/* Launch Fee */}
+              <div className="p-4 rounded-xl bg-[#0D0F16]/80 border border-white/5 flex flex-col justify-between">
+                <span className="text-xs text-[#8F96A3] font-medium">Protocol Launch Fee</span>
+                <div className="mt-2">
+                  {isLoading ? (
+                    <span className="text-lg font-bold text-gray-400 animate-pulse">Fetching...</span>
+                  ) : isError ? (
+                    <div>
+                      <span className="text-sm font-semibold text-rose-400">Error reading fee</span>
+                      <button 
+                        onClick={() => refetch()} 
+                        className="text-xs text-blue-400 block mt-1 hover:underline"
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <span className="text-2xl font-black text-white">{feeFormatted} ETH</span>
+                      <span className="block text-[11px] text-[#8F96A3] mt-0.5 font-mono">
+                        {feeWei.toString()} wei
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Chain ID & Target */}
+              <div className="p-4 rounded-xl bg-[#0D0F16]/80 border border-white/5 flex flex-col justify-between">
+                <span className="text-xs text-[#8F96A3] font-medium">Target Chain</span>
+                <div className="mt-2">
+                  <span className="text-lg font-bold text-white">{robinhoodTestnet.name}</span>
+                  <span className="block text-[11px] text-blue-400 mt-0.5 font-mono">
+                    Chain ID: {robinhoodTestnet.id}
+                  </span>
+                </div>
+              </div>
+
+              {/* Deploy Block */}
+              <div className="p-4 rounded-xl bg-[#0D0F16]/80 border border-white/5 flex flex-col justify-between">
+                <span className="text-xs text-[#8F96A3] font-medium">Factory Deploy Block</span>
+                <div className="mt-2">
+                  <span className="text-lg font-bold text-white font-mono">
+                    #{FACTORY_DEPLOY_BLOCK.toString()}
+                  </span>
+                  <span className="block text-[11px] text-[#8F96A3] mt-0.5">
+                    Start block for getLogs
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Contract Address Footnote */}
+            <div className="mt-6 pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[#8F96A3]">
+              <span className="font-mono truncate">
+                Factory: <span className="text-white">{LAUNCH_FACTORY_ADDRESS}</span>
+              </span>
+              <a
+                href={`${robinhoodTestnet.blockExplorers.default.url}/address/${LAUNCH_FACTORY_ADDRESS}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                <span>View on Explorer</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="w-full border-t border-white/5 py-6 px-4 text-center text-xs text-[#8F96A3]">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <span>Cointinental Launchpad — Robinhood Chain Testnet (Phase 1 Completed)</span>
+          <div className="flex items-center gap-4 text-[11px]">
+            <span>Next.js 15+</span>
+            <span>•</span>
+            <span>Wagmi v2</span>
+            <span>•</span>
+            <span>Viem</span>
+            <span>•</span>
+            <span>Tailwind CSS</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
