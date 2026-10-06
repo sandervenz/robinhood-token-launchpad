@@ -14,6 +14,7 @@ import {
   ExternalLink,
   Loader2 
 } from 'lucide-react';
+import { ConnectModal } from './ConnectModal';
 
 export function WalletButton() {
   const { address, isConnected, chainId } = useAccount();
@@ -64,30 +65,34 @@ export function WalletButton() {
     }
   };
 
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+
   if (!isConnected) {
     return (
-      <button
-        onClick={() => {
-          const injectedConnector = connectors[0];
-          if (injectedConnector) {
-            connect({ connector: injectedConnector });
-          }
-        }}
-        disabled={isConnecting}
-        className="btn-primary-glow px-4 py-2 text-xs font-bold inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
-      >
-        {isConnecting ? (
-          <>
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            <span>Connecting...</span>
-          </>
-        ) : (
-          <>
-            <Wallet className="w-3.5 h-3.5" />
-            <span>Connect Wallet</span>
-          </>
-        )}
-      </button>
+      <>
+        <button
+          onClick={() => setIsConnectModalOpen(true)}
+          disabled={isConnecting}
+          className="btn-primary-glow px-4 py-2 text-xs font-bold inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
+        >
+          {isConnecting ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Connecting...</span>
+            </>
+          ) : (
+            <>
+              <Wallet className="w-3.5 h-3.5" />
+              <span>Connect Wallet</span>
+            </>
+          )}
+        </button>
+
+        <ConnectModal 
+          isOpen={isConnectModalOpen} 
+          onClose={() => setIsConnectModalOpen(false)} 
+        />
+      </>
     );
   }
 

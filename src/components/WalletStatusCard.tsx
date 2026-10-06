@@ -15,6 +15,7 @@ import {
   LogOut, 
   Loader2 
 } from 'lucide-react';
+import { ConnectModal } from './ConnectModal';
 
 export function WalletStatusCard() {
   const { address, isConnected, chainId, status } = useAccount();
@@ -25,6 +26,7 @@ export function WalletStatusCard() {
 
   const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -97,12 +99,7 @@ export function WalletStatusCard() {
           </div>
 
           <button
-            onClick={() => {
-              const injectedConnector = connectors[0];
-              if (injectedConnector) {
-                connect({ connector: injectedConnector });
-              }
-            }}
+            onClick={() => setIsConnectModalOpen(true)}
             disabled={isConnecting}
             className="btn-primary-glow px-6 py-2.5 text-xs font-bold inline-flex items-center gap-2 cursor-pointer disabled:opacity-50 flex-shrink-0"
           >
@@ -226,6 +223,12 @@ export function WalletStatusCard() {
           </div>
         </div>
       )}
+
+      {/* Connect Modal */}
+      <ConnectModal 
+        isOpen={isConnectModalOpen} 
+        onClose={() => setIsConnectModalOpen(false)} 
+      />
     </div>
   );
 }
