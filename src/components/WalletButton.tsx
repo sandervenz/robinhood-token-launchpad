@@ -28,6 +28,7 @@ export function WalletButton() {
   const [mounted, setMounted] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,8 +65,6 @@ export function WalletButton() {
       setTimeout(() => setCopied(false), 2000);
     }
   };
-
-  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
 
   if (!isConnected) {
     return (
