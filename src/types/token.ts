@@ -21,6 +21,8 @@ export interface TokenData extends TokenLaunchedEvent {
   tokenReserve: bigint;
   realQuoteReserve: bigint;
   phase: TokenPhase;
+  feeBps: bigint;
+  creatorTaxBps: bigint;
   spotPriceEth: string;
   graduationProgressBps: bigint;
   graduationProgressPercent: number;
