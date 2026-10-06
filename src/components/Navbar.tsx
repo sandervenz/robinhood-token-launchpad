@@ -1,13 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { useLaunchFee } from '@/hooks/useLaunchFee';
 import { useTokens } from '@/context/TokenContext';
-import { Sparkles, Activity } from 'lucide-react';
+import { Sparkles, Activity, Rocket } from 'lucide-react';
 import { WalletButton } from './WalletButton';
+import { LaunchTokenModal } from './LaunchTokenModal';
 
 export function Navbar() {
   const { feeFormatted, isLoading, isError } = useLaunchFee();
   const { phaseFilter, setPhaseFilter } = useTokens();
+  const [isLaunchModalOpen, setIsLaunchModalOpen] = useState(false);
 
   const handleNavClick = (phase: 'all' | '0' | '2') => {
     setPhaseFilter(phase);
@@ -70,27 +73,29 @@ export function Navbar() {
           </button>
         </nav>
 
-        {/* Right: Wallet Controls & Optional Launch Fee */}
+        {/* Right: Launch Token Button + Wallet Controls */}
         <div className="flex items-center gap-2.5 justify-self-end">
-          {/* Launch Fee Pill (Only visible on wide screens to prevent any overlap) */}
-          <div className="hidden xl:flex items-center gap-2 glass-pill px-3 py-1.5 text-xs text-[#8F96A3]">
-            <Activity className="w-3.5 h-3.5 text-blue-400" />
-            <span>Launch Fee:</span>
-            {isLoading ? (
-              <span className="text-gray-400 animate-pulse">...</span>
-            ) : isError ? (
-              <span className="text-rose-400">Error</span>
-            ) : (
-              <span className="font-semibold text-white font-mono">
-                {feeFormatted} ETH
-              </span>
-            )}
-          </div>
+          {/* Bonus: Launch Token Button */}
+          <button
+            onClick={() => setIsLaunchModalOpen(true)}
+            className="btn-primary-glow px-3.5 py-1.5 text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-lg shadow-blue-500/10 hover:shadow-blue-500/25 transition-all flex-shrink-0"
+            title="Launch your own custom token (Bonus Feature)"
+          >
+            <Rocket className="w-3.5 h-3.5 text-white" />
+            <span className="hidden sm:inline">Launch Token</span>
+            <span className="sm:hidden">Launch</span>
+          </button>
 
           {/* Connect / User Account Button */}
           <WalletButton />
         </div>
       </div>
+
+      {/* Bonus Feature: Launch Token Modal */}
+      <LaunchTokenModal
+        isOpen={isLaunchModalOpen}
+        onClose={() => setIsLaunchModalOpen(false)}
+      />
     </header>
   );
 }
