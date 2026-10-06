@@ -8,11 +8,7 @@ import {
   RefreshCw, 
   ExternalLink, 
   Coins, 
-  CheckCircle2, 
-  Layers, 
-  AlertCircle,
-  HelpCircle,
-  Sparkles
+  AlertCircle 
 } from 'lucide-react';
 import { formatEther } from 'viem';
 
@@ -25,66 +21,63 @@ export function TokenMetricsTable() {
     switch (phase) {
       case 0:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Phase 0: Active Curve
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#C8F031]/10 text-[#C8F031] border border-[#C8F031]/30">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C8F031] animate-pulse" />
+            PHASE 0: TRADING
           </span>
         );
       case 1:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30">
-            Phase 1: Threshold Reached
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
+            PHASE 1: THRESHOLD MET
           </span>
         );
       case 2:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
-            Phase 2: Graduated (v4)
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/10 text-purple-300 border border-purple-500/30">
+            PHASE 2: GRADUATED (V4)
           </span>
         );
       case 3:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/30">
-            Phase 3: Cancelled
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/10 text-rose-300 border border-rose-500/30">
+            PHASE 3: CANCELLED
           </span>
         );
     }
   };
 
   return (
-    <div className="w-full max-w-5xl glass-card rounded-2xl p-6 sm:p-8 text-left mb-10 relative overflow-hidden">
+    <div className="w-full max-w-5xl bg-[#111318] border border-[#1E222B] rounded-xl p-5 sm:p-6 text-left mb-8 relative">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#1E222B]">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-            <BarChart3 className="w-5 h-5" />
+          <div className="w-8 h-8 rounded-lg bg-[#161922] border border-[#262C38] flex items-center justify-center text-[#C8F031]">
+            <BarChart3 className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-white">Aggregated Token Metrics (Multicall3)</h2>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30">
+              <h2 className="text-sm font-bold text-[#EDEDEC] font-mono uppercase tracking-wider">
+                Aggregated Token Metrics (Multicall3)
+              </h2>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#161922] text-[#808593] border border-[#222734]">
                 Step 4 Complete
               </span>
             </div>
-            <p className="text-xs text-[#8F96A3]">
-              Fetched via Multicall3 contract (`0xcA11...CA11`) — reserves, prices, thresholds & phase in 1 RPC batch
+            <p className="text-[11px] text-[#808593] font-mono">
+              Executed via Multicall3 (<code className="text-[#EDEDEC]">0xcA11...CA11</code>) — 7 on-chain calls batched per token
             </p>
           </div>
         </div>
 
         {/* Action Controls */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 text-[11px] text-[#8F96A3]">
-            <Layers className="w-3.5 h-3.5 text-blue-400" />
-            <span>7 batch calls / token</span>
-          </div>
-
           <button
             onClick={() => refetch()}
             disabled={isLoading || isRefreshing}
-            className="glass-pill px-3.5 py-1.5 text-xs text-[#8F96A3] hover:text-white hover:border-white/20 transition-all inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            className="px-3 py-1.5 rounded-lg bg-[#161922] hover:bg-[#1C202B] border border-[#262C38] text-xs font-mono text-[#808593] hover:text-[#EDEDEC] transition-all inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing || isLoading ? 'animate-spin text-purple-400' : ''}`} />
+            <RefreshCw className={`w-3 h-3 ${isRefreshing || isLoading ? 'animate-spin text-[#C8F031]' : ''}`} />
             <span>{isRefreshing ? 'Refreshing...' : 'Refresh Metrics'}</span>
           </button>
         </div>
@@ -92,25 +85,25 @@ export function TokenMetricsTable() {
 
       {/* Loading Skeleton */}
       {isLoading && (
-        <div className="py-12 space-y-4">
-          <div className="flex items-center justify-center gap-3 text-sm text-purple-400">
-            <RefreshCw className="w-4 h-4 animate-spin" />
-            <span>Executing Multicall3 aggregate3 across all tokens...</span>
+        <div className="py-8 space-y-3 font-mono">
+          <div className="flex items-center justify-center gap-2 text-xs text-[#C8F031]">
+            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            <span>Executing Multicall3 aggregate3 RPC call across token contracts...</span>
           </div>
-          <div className="w-full h-24 bg-white/5 rounded-xl animate-pulse" />
+          <div className="w-full h-20 bg-[#161922] rounded-lg animate-pulse" />
         </div>
       )}
 
       {/* Error state */}
       {isError && (
-        <div className="my-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between gap-3 text-xs text-rose-300">
+        <div className="my-4 p-3 rounded-lg bg-[#2B1418] border border-[#4E2128] flex items-center justify-between gap-3 text-xs text-rose-300 font-mono">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
             <span>Failed to read metrics: {error?.message}</span>
           </div>
           <button
             onClick={() => refetch()}
-            className="px-3 py-1 bg-rose-500 text-white rounded-lg hover:bg-rose-400 font-semibold cursor-pointer"
+            className="px-2.5 py-1 bg-rose-500 text-white rounded hover:bg-rose-400 font-semibold cursor-pointer"
           >
             Retry
           </button>
@@ -119,26 +112,25 @@ export function TokenMetricsTable() {
 
       {/* Table view */}
       {!isLoading && tokens.length > 0 && (
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="mt-3 overflow-x-auto">
+          <table className="w-full text-left text-xs font-mono">
             <thead>
-              <tr className="border-b border-white/10 text-[#8F96A3] font-medium">
-                <th className="py-3 px-3">Token Asset</th>
-                <th className="py-3 px-3">Spot Price</th>
-                <th className="py-3 px-3">ETH Raised / Target</th>
-                <th className="py-3 px-3">Graduation Progress</th>
-                <th className="py-3 px-3">Phase Status</th>
-                <th className="py-3 px-3 text-right">Links</th>
+              <tr className="border-b border-[#1E222B] text-[#606575] text-[10px] uppercase tracking-wider">
+                <th className="py-2.5 px-3">Token Asset</th>
+                <th className="py-2.5 px-3">Spot Price</th>
+                <th className="py-2.5 px-3">ETH Raised / Target</th>
+                <th className="py-2.5 px-3">Progress</th>
+                <th className="py-2.5 px-3">Phase Status</th>
+                <th className="py-2.5 px-3 text-right">Links</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-[#1E222B]">
               {tokens.map((t) => (
-                <tr key={t.token} className="hover:bg-white/[0.02] transition-colors">
+                <tr key={t.token} className="hover:bg-[#161922]/50 transition-colors">
                   {/* Token Asset (Logo + Name + Symbol) */}
-                  <td className="py-3.5 px-3">
-                    <div className="flex items-center gap-3">
-                      {/* Logo or placeholder */}
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#1b2333] to-[#0e121a] border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  <td className="py-2.5 px-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-md bg-[#161922] border border-[#262C38] flex items-center justify-center flex-shrink-0 overflow-hidden">
                         {t.logo && t.logo.startsWith('http') ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img 
@@ -146,22 +138,21 @@ export function TokenMetricsTable() {
                             alt={t.symbol} 
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              // Fallback on image error
                               (e.target as HTMLElement).style.display = 'none';
                             }}
                           />
                         ) : (
-                          <Coins className="w-4 h-4 text-blue-400" />
+                          <Coins className="w-3.5 h-3.5 text-[#808593]" />
                         )}
                       </div>
                       <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-white text-sm">{t.name}</span>
-                          <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-white/10 text-blue-300 font-semibold">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold text-[#EDEDEC] text-xs">{t.name}</span>
+                          <span className="text-[10px] px-1 py-0.2 rounded bg-[#161922] text-[#808593]">
                             ${t.symbol}
                           </span>
                         </div>
-                        <span className="font-mono text-[10px] text-[#8F96A3] block mt-0.5">
+                        <span className="text-[10px] text-[#606575] block">
                           {truncate(t.token)}
                         </span>
                       </div>
@@ -169,65 +160,58 @@ export function TokenMetricsTable() {
                   </td>
 
                   {/* Spot Price */}
-                  <td className="py-3.5 px-3">
-                    <div className="font-mono font-bold text-white text-sm">
-                      {t.phase === 2 ? (
-                        <span className="text-purple-300">Graduated</span>
-                      ) : (
-                        `${t.spotPriceEth} ETH`
-                      )}
-                    </div>
-                    <span className="text-[10px] text-[#8F96A3] block">
-                      Spot quote
-                    </span>
+                  <td className="py-2.5 px-3 font-semibold text-[#EDEDEC]">
+                    {t.phase === 2 ? (
+                      <span className="text-purple-300">Graduated</span>
+                    ) : (
+                      `${t.spotPriceEth} ETH`
+                    )}
                   </td>
 
                   {/* ETH Raised vs Target */}
-                  <td className="py-3.5 px-3 font-mono">
-                    <span className="text-white font-medium">
+                  <td className="py-2.5 px-3">
+                    <span className="text-[#EDEDEC] font-semibold">
                       {parseFloat(formatEther(t.realQuoteReserve)).toFixed(4)} ETH
                     </span>
-                    <span className="text-[#8F96A3] block text-[10px]">
-                      Target: {parseFloat(formatEther(t.graduationThreshold)).toFixed(3)} ETH
+                    <span className="text-[#606575] block text-[10px]">
+                      / {parseFloat(formatEther(t.graduationThreshold)).toFixed(3)} ETH
                     </span>
                   </td>
 
                   {/* Graduation Progress Bar */}
-                  <td className="py-3.5 px-3 min-w-[150px]">
-                    <div className="flex items-center justify-between text-[11px] mb-1 font-mono">
-                      <span className="text-white font-semibold">
+                  <td className="py-2.5 px-3 min-w-[130px]">
+                    <div className="flex items-center justify-between text-[10px] mb-1">
+                      <span className="text-[#EDEDEC] font-semibold">
                         {t.graduationProgressPercent.toFixed(1)}%
                       </span>
                     </div>
-                    <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-[#0A0B0E] rounded-full h-1 overflow-hidden">
                       <div 
-                        className={`h-1.5 rounded-full transition-all duration-500 ${
+                        className={`h-1 rounded-full transition-all duration-300 ${
                           t.phase === 2
                             ? 'bg-purple-500'
-                            : t.graduationProgressPercent > 50
-                            ? 'bg-gradient-to-r from-blue-500 to-emerald-400'
-                            : 'bg-gradient-to-r from-blue-500 to-indigo-500'
+                            : 'bg-[#C8F031]'
                         }`}
-                        style={{ width: `${Math.min(100, t.graduationProgressPercent)}%` }}
+                        style={{ width: `${Math.min(100, Math.max(0, t.graduationProgressPercent))}%` }}
                       />
                     </div>
                   </td>
 
                   {/* Phase Status */}
-                  <td className="py-3.5 px-3">
+                  <td className="py-2.5 px-3">
                     {getPhaseBadge(t.phase)}
                   </td>
 
                   {/* Explorer Link */}
-                  <td className="py-3.5 px-3 text-right">
+                  <td className="py-2.5 px-3 text-right">
                     <a
                       href={`${robinhoodTestnet.blockExplorers.default.url}/address/${t.curve}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-purple-400 hover:text-purple-300 transition-colors"
-                      title="View Bonding Curve Contract"
+                      className="inline-flex items-center gap-1 text-[#C8F031] hover:underline"
+                      title="View Curve Contract"
                     >
-                      <span className="text-[11px]">Curve</span>
+                      <span>Curve</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </td>

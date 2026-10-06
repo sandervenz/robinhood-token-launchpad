@@ -13,19 +13,13 @@ import {
   X, 
   ArrowDown, 
   AlertCircle, 
-  Check, 
   Sliders, 
-  Coins, 
-  Wallet, 
   ArrowRight, 
-  ShieldCheck, 
   Loader2,
   ExternalLink,
   CheckCircle2,
   AlertTriangle,
-  RotateCcw
 } from 'lucide-react';
-
 import { useTokens } from '@/context/TokenContext';
 
 interface BuyModalProps {
@@ -97,14 +91,14 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
     if (cleanStr && cleanStr !== '.') {
       const parts = cleanStr.split('.');
       if (parts.length > 2) {
-        parseError = 'Format angka tidak valid';
+        parseError = 'Invalid numeric format';
       } else if (parts[1] && parts[1].length > 18) {
-        parseError = 'Maksimal 18 desimal';
+        parseError = 'Exceeds 18 decimals limit';
       } else {
         try {
           quoteIn = parseEther(cleanStr);
         } catch {
-          parseError = 'Format angka tidak valid';
+          parseError = 'Invalid numeric format';
         }
       }
     }
@@ -128,20 +122,20 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
       disabled: boolean;
       text: string;
       action?: 'connect' | 'switch' | 'buy';
-    } = { disabled: false, text: 'Beli Token Sekarang', action: 'buy' };
+    } = { disabled: false, text: `Buy $${token.symbol}`, action: 'buy' };
 
     if (!isConnected) {
-      buttonState = { disabled: false, text: 'Connect Wallet untuk Beli', action: 'connect' };
+      buttonState = { disabled: false, text: 'Connect Wallet to Buy', action: 'connect' };
     } else if (isWrongChain) {
-      buttonState = { disabled: false, text: 'Pindah ke Robinhood Testnet', action: 'switch' };
+      buttonState = { disabled: false, text: 'Switch to Robinhood Testnet', action: 'switch' };
     } else if (isPhaseInvalid) {
-      buttonState = { disabled: true, text: 'Token Tidak di Phase 0 (Trading)' };
+      buttonState = { disabled: true, text: 'Curve Not in Trading Phase' };
     } else if (parseError) {
       buttonState = { disabled: true, text: parseError };
     } else if (isZeroAmount) {
-      buttonState = { disabled: true, text: 'Masukkan Jumlah ETH' };
+      buttonState = { disabled: true, text: 'Enter ETH Amount' };
     } else if (isInsufficientBalance) {
-      buttonState = { disabled: true, text: 'Saldo ETH Tidak Cukup' };
+      buttonState = { disabled: true, text: 'Insufficient ETH Balance' };
     }
 
     return {
@@ -184,49 +178,54 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn"
+      onClick={handleModalClose}
+      role="dialog"
+      aria-modal="true"
+    >
       {/* Modal Dialog Card */}
       <div 
-        className="w-full max-w-lg glass-card rounded-3xl p-6 sm:p-8 relative border border-white/15 shadow-2xl shadow-blue-500/10 text-left overflow-hidden"
+        className="w-full max-w-lg terminal-card p-6 sm:p-7 relative border border-[#1E222B] bg-[#111318] shadow-2xl text-left overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 pb-5 border-b border-white/10">
+        <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#1E222B]">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600/30 to-indigo-600/10 border border-blue-400/20 flex items-center justify-center text-white font-extrabold text-base">
+            <div className="w-10 h-10 rounded-lg bg-[#181B22] border border-[#242934] flex items-center justify-center text-white font-mono font-bold text-sm tracking-wider">
               {token.symbol.slice(0, 3)}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-white tracking-tight">Beli ${token.symbol}</h3>
+                <h3 className="text-base font-bold text-white tracking-tight">Buy ${token.symbol}</h3>
                 <StatusBadge phase={token.phase} />
               </div>
-              <p className="text-xs text-[#8F96A3]">{token.name}</p>
+              <p className="text-xs text-[#808593] font-mono">{token.name}</p>
             </div>
           </div>
 
           {!isBusy && (
             <button
               onClick={handleModalClose}
-              className="p-2 rounded-full hover:bg-white/10 text-[#8F96A3] hover:text-white transition-colors cursor-pointer"
+              className="p-1.5 rounded hover:bg-white/5 text-[#808593] hover:text-white transition-colors cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>
 
         {/* ======================================================== */}
-        {/* STATE 2: PENDING MINING (Terkirim, Menunggu Masuk Blok)  */}
+        {/* STATE 2: PENDING MINING (Broadcasting on Robinhood)      */}
         {/* ======================================================== */}
         {txState === 'pending_tx' && txHash && (
-          <div className="py-10 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mx-auto text-blue-400">
-              <Loader2 className="w-8 h-8 animate-spin" />
+          <div className="py-10 text-center space-y-4 animate-fadeIn">
+            <div className="w-14 h-14 rounded-lg bg-[#C8F031]/10 border border-[#C8F031]/30 flex items-center justify-center mx-auto text-[#C8F031]">
+              <Loader2 className="w-7 h-7 animate-spin" />
             </div>
             <div>
-              <h4 className="text-lg font-bold text-white">Transaksi Terkirim</h4>
-              <p className="text-xs text-[#8F96A3] mt-1 max-w-xs mx-auto">
-                Menunggu konfirmasi blok di Robinhood Testnet...
+              <h4 className="text-base font-bold text-white">Broadcasting Transaction</h4>
+              <p className="text-xs text-[#808593] mt-1 max-w-xs mx-auto font-mono">
+                Awaiting block confirmation on Robinhood Chain (~2-4 seconds)...
               </p>
             </div>
 
@@ -235,9 +234,9 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
                 href={`${robinhoodTestnet.blockExplorers.default.url}/tx/${txHash}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-mono hover:bg-blue-500/20 transition-all"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#181B22] border border-[#242934] text-xs font-mono text-[#808593] hover:text-white transition-all"
               >
-                <span>Lihat di Block Explorer</span>
+                <span>View on Explorer</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
@@ -245,44 +244,51 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
         )}
 
         {/* ======================================================== */}
-        {/* STATE 3: SUCCESS (Berhasil Masuk Blok)                   */}
+        {/* STATE 3: SUCCESS (Mined in Block)                        */}
         {/* ======================================================== */}
         {txState === 'success' && txResult && (
-          <div className="py-8 text-center space-y-5 animate-fadeIn">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400 shadow-lg shadow-emerald-500/10">
-              <CheckCircle2 className="w-8 h-8" />
+          <div className="py-6 text-center space-y-4 animate-scaleUp">
+            <div className="w-14 h-14 rounded-lg bg-[#C8F031]/15 border border-[#C8F031]/40 flex items-center justify-center mx-auto text-[#C8F031]">
+              <CheckCircle2 className="w-7 h-7" />
             </div>
 
             <div>
-              <span className="text-xs uppercase font-bold text-emerald-400 tracking-wider">
-                Pembelian Berhasil
+              <span className="text-[11px] font-mono uppercase font-bold text-[#C8F031] tracking-wider">
+                Order Executed Successfully
               </span>
-              <h4 className="text-2xl font-black text-white mt-1">
+              <h4 className="text-2xl font-mono font-black text-white mt-1">
                 +{parseFloat(formatEther(txResult.tokensReceived)).toLocaleString(undefined, { maximumFractionDigits: 4 })} ${token.symbol}
               </h4>
-              <p className="text-xs text-[#8F96A3] mt-1">
-                Token telah ditransfer ke wallet Anda (tercatat di block #{txResult.blockNumber.toString()}).
+              <p className="text-xs text-[#808593] mt-1 font-mono">
+                Tokens credited to your wallet in block #{txResult.blockNumber.toString()}.
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-[#08090C] border border-white/5 flex items-center justify-between text-xs">
-              <span className="text-[#8F96A3]">Transaction Hash:</span>
-              <a
-                href={`${robinhoodTestnet.blockExplorers.default.url}/tx/${txResult.txHash}`}
-                target="_blank"
-                rel="noreferrer"
-                className="font-mono text-blue-400 hover:underline inline-flex items-center gap-1"
-              >
-                <span>{`${txResult.txHash.slice(0, 10)}...${txResult.txHash.slice(-8)}`}</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+            {/* Receipt Box */}
+            <div className="p-3.5 rounded-lg bg-[#0A0B0E] border border-[#1E222B] text-left text-xs font-mono space-y-1.5">
+              <div className="flex items-center justify-between text-[#808593]">
+                <span>Transaction Hash:</span>
+                <a
+                  href={`${robinhoodTestnet.blockExplorers.default.url}/tx/${txResult.txHash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[#C8F031] hover:underline inline-flex items-center gap-1"
+                >
+                  <span>{`${txResult.txHash.slice(0, 10)}...${txResult.txHash.slice(-8)}`}</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+              <div className="flex items-center justify-between text-[#808593]">
+                <span>Status:</span>
+                <span className="text-white font-bold">1 Confirmation</span>
+              </div>
             </div>
 
             <button
               onClick={handleModalClose}
-              className="w-full py-3.5 rounded-full btn-primary-glow font-bold text-sm tracking-wide cursor-pointer"
+              className="w-full py-2.5 rounded btn-terminal-primary font-bold text-xs font-mono tracking-wider cursor-pointer uppercase"
             >
-              Selesai & Tutup
+              Done & Return
             </button>
           </div>
         )}
@@ -292,39 +298,39 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
         {/* ======================================================== */}
         {txState !== 'pending_tx' && txState !== 'success' && (
           <>
-            {/* User Balance Info Bar */}
-            <div className="py-3 px-4 my-4 rounded-xl bg-[#08090C]/80 border border-white/5 flex items-center justify-between text-xs">
-              <span className="text-[#8F96A3]">Saldo ${token.symbol} Anda:</span>
-              <span className="font-bold text-white font-mono">
+            {/* User Token Holdings Banner */}
+            <div className="py-2.5 px-3.5 my-3 rounded-lg bg-[#0A0B0E] border border-[#1E222B] flex items-center justify-between text-xs font-mono">
+              <span className="text-[#808593]">Your ${token.symbol} Balance:</span>
+              <span className="font-bold text-white">
                 {userTokenBalanceFormatted} {token.symbol}
               </span>
             </div>
 
             {/* STATE 4: REJECTED ALERT */}
             {txState === 'rejected' && (
-              <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 flex items-center justify-between gap-2 mb-4 animate-fadeIn">
+              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 flex items-center justify-between gap-2 mb-3 font-mono animate-fadeIn">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span>{txError?.message || 'Transaksi dibatalkan di wallet.'}</span>
+                  <span>{txError?.message || 'Transaction rejected by user in wallet.'}</span>
                 </div>
                 <button
                   onClick={resetState}
                   className="text-[11px] underline text-white hover:text-amber-200 cursor-pointer flex-shrink-0"
                 >
-                  Tutup
+                  Dismiss
                 </button>
               </div>
             )}
 
             {/* STATE 5: ERROR / REVERT ALERT */}
             {txState === 'error' && (
-              <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-300 flex items-start justify-between gap-2 mb-4 animate-fadeIn">
+              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-xs text-rose-300 flex items-start justify-between gap-2 mb-3 font-mono animate-fadeIn">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold block">Gagal Mengeksekusi Transaksi</span>
+                    <span className="font-bold block">Execution Failed</span>
                     <span className="text-[11px] leading-relaxed text-rose-200">
-                      {txError?.message || 'Transaksi gagal atau di-revert oleh kontrak.'}
+                      {txError?.message || 'Transaction reverted on-chain.'}
                     </span>
                   </div>
                 </div>
@@ -338,12 +344,12 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
             )}
 
             {/* ETH Input Container */}
-            <div className="space-y-2 mb-4">
-              <div className="flex items-center justify-between text-xs text-[#8F96A3]">
-                <span>Anda Bayar (ETH)</span>
-                <div className="flex items-center gap-2">
-                  <span>Saldo:</span>
-                  <span className="font-mono text-white font-semibold">
+            <div className="space-y-1.5 mb-3 font-mono">
+              <div className="flex items-center justify-between text-xs text-[#808593]">
+                <span>You Pay (ETH)</span>
+                <div className="flex items-center gap-1.5">
+                  <span>Balance:</span>
+                  <span className="text-white font-bold">
                     {ethBalance ? `${parseFloat(formatUnits(ethBalance.value, ethBalance.decimals)).toFixed(4)} ETH` : '0 ETH'}
                   </span>
                 </div>
@@ -356,88 +362,89 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
                   disabled={isBusy}
                   value={amountStr}
                   onChange={(e) => setAmountStr(e.target.value.replace(/,/g, '.'))}
-                  className="w-full bg-[#08090C] border border-white/10 rounded-2xl px-4 py-3.5 text-xl font-bold font-mono text-white placeholder-[#8F96A3] focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
+                  className="w-full bg-[#0A0B0E] border border-[#1E222B] rounded-lg px-3.5 py-2.5 text-lg font-bold font-mono text-white placeholder-[#808593] focus:outline-none focus:border-[#C8F031]/60 disabled:opacity-50"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                  <span className="font-mono text-xs font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20">
+                  <span className="font-mono text-xs font-bold text-[#C8F031] bg-[#161B14] px-2 py-0.5 rounded border border-[#C8F031]/30">
                     ETH
                   </span>
                 </div>
               </div>
 
-              {/* Quick Preset Buttons */}
-              <div className="flex items-center gap-2 pt-1">
+              {/* Quick Presets */}
+              <div className="flex items-center gap-1.5 pt-1">
                 {['0.001', '0.005', '0.01', '0.02'].map((preset) => (
                   <button
                     key={preset}
                     disabled={isBusy}
                     onClick={() => setAmountStr(preset)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium transition-all cursor-pointer disabled:opacity-50 ${
+                    className={`px-2 py-1 rounded text-[11px] font-mono font-medium transition-all cursor-pointer disabled:opacity-50 ${
                       amountStr === preset
-                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                        : 'bg-white/5 text-[#8F96A3] hover:text-white hover:bg-white/10'
+                        ? 'bg-[#C8F031]/15 text-[#C8F031] border border-[#C8F031]/40'
+                        : 'bg-[#161820] text-[#808593] hover:text-white hover:bg-[#1E222C]'
                     }`}
                   >
-                    {preset} ETH
+                    {preset}
                   </button>
                 ))}
                 {ethBalance && ethBalance.value > BigInt(0) && (
                   <button
                     disabled={isBusy}
+                    title="Leaves 0.001 ETH for gas"
                     onClick={() => {
-                      const safeMax = ethBalance.value > parseEther('0.002') 
-                        ? ethBalance.value - parseEther('0.002') 
+                      const safeMax = ethBalance.value > parseEther('0.001') 
+                        ? ethBalance.value - parseEther('0.001') 
                         : ethBalance.value;
                       setAmountStr(formatEther(safeMax));
                     }}
-                    className="px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium bg-white/5 text-amber-300 hover:bg-white/10 cursor-pointer ml-auto disabled:opacity-50"
+                    className="px-2 py-1 rounded text-[11px] font-mono font-medium bg-[#161820] text-amber-300 hover:bg-[#1E222C] cursor-pointer ml-auto disabled:opacity-50"
                   >
-                    Max Safe
+                    Max (Safe)
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Arrow Divider */}
+            {/* Divider */}
             <div className="flex justify-center -my-1 z-10 relative">
-              <div className="w-8 h-8 rounded-full bg-[#0D0F16] border border-white/10 flex items-center justify-center text-blue-400">
-                <ArrowDown className="w-4 h-4" />
+              <div className="w-6 h-6 rounded-full bg-[#181B22] border border-[#242934] flex items-center justify-center text-[#808593]">
+                <ArrowDown className="w-3 h-3" />
               </div>
             </div>
 
-            {/* Estimated Tokens Output Card */}
-            <div className="p-4 rounded-2xl bg-[#08090C]/80 border border-white/5 my-3">
-              <div className="flex items-center justify-between text-xs text-[#8F96A3] mb-1">
-                <span>Perkiraan Diterima</span>
-                <span className="text-[11px] text-emerald-400 font-semibold">Bonding Curve Quote</span>
+            {/* Estimated Tokens Output */}
+            <div className="p-3.5 rounded-lg bg-[#0A0B0E] border border-[#1E222B] my-2 font-mono">
+              <div className="flex items-center justify-between text-xs text-[#808593] mb-1">
+                <span>Estimated Receive</span>
+                <span className="text-[10px] text-[#C8F031]">Bonding Curve Quote</span>
               </div>
               <div className="flex items-baseline justify-between">
-                <span className="font-mono text-2xl font-black text-white">
+                <span className="text-xl font-bold text-white tracking-tight">
                   {estimatedTokensFormatted}
                 </span>
-                <span className="font-mono text-sm font-bold text-blue-400">
+                <span className="text-xs font-bold text-[#C8F031]">
                   ${token.symbol}
                 </span>
               </div>
             </div>
 
             {/* Slippage Selector */}
-            <div className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white/5 text-xs text-[#8F96A3] mb-4">
+            <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-[#0A0B0E] border border-[#1E222B] text-xs text-[#808593] font-mono mb-3">
               <div className="flex items-center gap-1.5">
-                <Sliders className="w-3.5 h-3.5 text-blue-400" />
-                <span>Toleransi Slippage:</span>
+                <Sliders className="w-3 h-3 text-[#808593]" />
+                <span>Slippage:</span>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 {[0.5, 1, 2].map((pct) => (
                   <button
                     key={pct}
                     disabled={isBusy}
                     onClick={() => handleSelectSlippage(pct)}
-                    className={`px-2 py-0.5 rounded text-[11px] font-mono font-semibold transition-all cursor-pointer disabled:opacity-50 ${
+                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-all cursor-pointer disabled:opacity-50 ${
                       slippagePercent === pct
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-white/5 text-[#8F96A3] hover:text-white'
+                        ? 'bg-[#C8F031] text-[#0A0B0E]'
+                        : 'bg-[#181B22] text-[#808593] hover:text-white'
                     }`}
                   >
                     {pct}%
@@ -446,11 +453,11 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
               </div>
             </div>
 
-            {/* Calculation Breakdown Accordion/Details */}
-            <div className="space-y-1.5 py-3 border-t border-white/5 text-[11px] text-[#8F96A3] font-mono">
+            {/* Breakdown Accordion */}
+            <div className="space-y-1 py-2.5 border-t border-[#1E222B] text-[11px] text-[#808593] font-mono">
               <div className="flex items-center justify-between">
-                <span>Minimum Diterima (Guaranteed):</span>
-                <span className="text-white font-semibold">{minTokensFormatted} ${token.symbol}</span>
+                <span>Minimum Out:</span>
+                <span className="text-white font-medium">{minTokensFormatted} ${token.symbol}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Protocol Fee ({Number(token.feeBps) / 100}%):</span>
@@ -459,7 +466,7 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
                 </span>
               </div>
               {token.creatorTaxBps > BigInt(0) && (
-                <div className="flex items-center justify-between text-amber-300/90">
+                <div className="flex items-center justify-between text-amber-300">
                   <span>Creator Tax ({Number(token.creatorTaxBps) / 100}%):</span>
                   <span>
                     {calculation ? formatEther(calculation.quote.creatorTax) : '0'} ETH
@@ -467,36 +474,36 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <span>Harga Spot:</span>
+                <span>Spot Price:</span>
                 <span className="text-white">{token.spotPriceEth} ETH</span>
               </div>
             </div>
 
-            {/* STATE 1: AWAITING WALLET OR SUBMIT BUTTON */}
-            <div className="mt-5">
+            {/* Submit Action Button */}
+            <div className="mt-4">
               {txState === 'awaiting_wallet' ? (
                 <button
                   disabled
-                  className="w-full py-3.5 rounded-full bg-blue-600/50 text-white font-bold text-sm flex items-center justify-center gap-2 cursor-wait"
+                  className="w-full py-2.5 rounded bg-[#1C202B] text-white font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-wait border border-[#2B313F]"
                 >
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Konfirmasi di wallet...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-[#C8F031]" />
+                  <span>Confirm in Wallet...</span>
                 </button>
               ) : calculation?.buttonState.action === 'switch' ? (
                 <button
                   onClick={() => switchChain({ chainId: robinhoodTestnet.id })}
-                  className="w-full py-3.5 rounded-full bg-amber-500 hover:bg-amber-400 text-[#08090C] font-bold text-sm transition-all shadow-lg shadow-amber-500/20 cursor-pointer"
+                  className="w-full py-2.5 rounded bg-amber-500 hover:bg-amber-400 text-[#0A0B0E] font-mono font-bold text-xs transition-all cursor-pointer"
                 >
-                  Pindah ke Robinhood Testnet
+                  Switch to Robinhood Testnet
                 </button>
               ) : (
                 <button
                   onClick={handleConfirmBuy}
                   disabled={calculation?.buttonState.disabled || isBusy}
-                  className="w-full py-3.5 rounded-full btn-primary-glow font-bold text-sm tracking-wide transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full py-2.5 rounded btn-terminal-primary font-mono font-bold text-xs tracking-wider transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2 uppercase"
                 >
                   <span>{calculation?.buttonState.text}</span>
-                  {!calculation?.buttonState.disabled && <ArrowRight className="w-4 h-4" />}
+                  {!calculation?.buttonState.disabled && <ArrowRight className="w-3.5 h-3.5" />}
                 </button>
               )}
             </div>

@@ -21,18 +21,18 @@ export function NetworkAlert() {
   if (!isWrongNetwork) return null;
 
   return (
-    <div className="w-full bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-amber-500/15 border-y border-amber-500/30 px-4 py-3 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+    <div className="w-full bg-[#201013] border-b border-[#4E2128] px-4 py-2.5">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left font-mono">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 text-amber-400">
-            <AlertTriangle className="w-4 h-4" />
+          <div className="w-6 h-6 rounded bg-rose-500/20 flex items-center justify-center flex-shrink-0 text-rose-400">
+            <AlertTriangle className="w-3.5 h-3.5" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">
-              Wrong Network Detected
+            <p className="text-xs font-bold text-[#EDEDEC]">
+              WRONG NETWORK DETECTED (CHAIN ID: {chainId})
             </p>
-            <p className="text-xs text-amber-300/80">
-              Your wallet is connected to Chain ID {chainId}. Please switch to {robinhoodTestnet.name} (Chain ID: {robinhoodTestnet.id}) to trade.
+            <p className="text-[11px] text-rose-300/80">
+              Please switch to {robinhoodTestnet.name} (Chain ID: {robinhoodTestnet.id}) to execute trades.
             </p>
           </div>
         </div>
@@ -40,12 +40,12 @@ export function NetworkAlert() {
         <button
           onClick={() => switchChain({ chainId: robinhoodTestnet.id })}
           disabled={isPending}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-400 text-[#08090C] text-xs font-bold transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-400 text-white text-xs font-bold transition-all disabled:opacity-50 cursor-pointer flex-shrink-0"
         >
           {isPending ? (
             <>
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              <span>Switching Network...</span>
+              <span>Switching...</span>
             </>
           ) : (
             <>

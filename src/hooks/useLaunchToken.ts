@@ -58,11 +58,34 @@ export function useLaunchToken(onSuccessCallback?: () => void) {
       setParsedError(null);
 
       try {
-        // 1. Generate salt unik
+        // 1. Read live launch fee & economics dynamically from factory
+        let liveLaunchFee = parseEther('0.0005');
+        let expectedEconomics = '0x416423331ca6d9743485ce8245e1e90c61c04176b119bc0224ad64d76cd7537e' as `0x${string}`;
+
+        try {
+          const fee = await publicClient.readContract({
+            address: LAUNCH_FACTORY_ADDRESS,
+            abi: LAUNCH_FACTORY_ABI,
+            functionName: 'launchFee',
+          }) as bigint;
+          if (fee > BigInt(0)) liveLaunchFee = fee;
+
+          const eco = await publicClient.readContract({
+            address: LAUNCH_FACTORY_ADDRESS,
+            abi: LAUNCH_FACTORY_ABI,
+            functionName: 'previewLaunchEconomics',
+            args: [BigInt(1), '0x0000000000000000000000000000000000000000'],
+          }) as `0x${string}`;
+          if (eco) expectedEconomics = eco;
+        } catch {
+          // Fallback to verified constants
+        }
+
+        // 2. Generate random salt
         const randomSeed = `${Date.now()}_${Math.random()}_${address}`;
         const salt = keccak256(toHex(randomSeed));
 
-        // 2. Format TokenParams
+        // 3. Format TokenParams
         const params = {
           name: name.trim(),
           symbol: symbol.trim().toUpperCase(),
@@ -78,23 +101,23 @@ export function useLaunchToken(onSuccessCallback?: () => void) {
           creatorFeeRecipient: '0x0000000000000000000000000000000000000000' as Address,
           creatorTaxBps: 0,
           buybackEnabled: false,
-          expectedEconomics: '0x416423331ca6d9743485ce8245e1e90c61c04176b119bc0224ad64d76cd7537e' as `0x${string}`,
+          expectedEconomics,
           salt,
         };
 
-        // 3. Kirim transaksi ke LaunchFactory on-chain
+        // 4. Send transaction to factory on-chain
         const hash = await writeContractAsync({
           address: LAUNCH_FACTORY_ADDRESS,
           abi: LAUNCH_FACTORY_ABI,
           functionName: 'launchToken',
           args: [params, BigInt(1), '0x0000000000000000000000000000000000000000'],
-          value: parseEther('0.0005'), // launchFee 0.0005 ETH
+          value: liveLaunchFee,
         });
 
         setTxHash(hash);
         setState('pending_tx');
 
-        // 4. Tunggu blok receipt
+        // 5. Wait for block confirmation
         const receipt = await publicClient.waitForTransactionReceipt({
           hash,
           confirmations: 1,
@@ -104,7 +127,7 @@ export function useLaunchToken(onSuccessCallback?: () => void) {
           throw new Error('Transaction was reverted on-chain.');
         }
 
-        // 5. Ekstrak TokenLaunched event
+        // 6. Decode TokenLaunched event
         let tokenAddress: Address = '0x0000000000000000000000000000000000000000';
         let curveAddress: Address = '0x0000000000000000000000000000000000000000';
 
@@ -123,7 +146,7 @@ export function useLaunchToken(onSuccessCallback?: () => void) {
               }
             }
           } catch {
-            // Abaikan log lain
+            // Skip non-matching log
           }
         }
 
@@ -136,7 +159,7 @@ export function useLaunchToken(onSuccessCallback?: () => void) {
         });
         setState('success');
 
-        // 6. Refresh token list seketika
+        // 7. Auto-refresh token list
         await refetchTokens();
         if (onSuccessCallback) {
           onSuccessCallback();
