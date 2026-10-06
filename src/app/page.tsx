@@ -17,80 +17,75 @@ import {
 import { robinhoodTestnet } from '@/config/chain';
 import { TokenData } from '@/types/token';
 import { 
-  Sparkles, 
-  Layers, 
+  Terminal,
   Activity, 
-  ShieldCheck, 
   ChevronDown, 
   ChevronUp, 
-  Terminal,
+  ArrowUpRight,
+  ShieldCheck,
   Zap,
-  ArrowUpRight
+  Layers
 } from 'lucide-react';
 
 export default function Home() {
-  const { feeFormatted, feeWei, isLoading: isFeeLoading } = useLaunchFee();
+  const { feeFormatted, isLoading: isFeeLoading } = useLaunchFee();
   const [selectedTokenForBuy, setSelectedTokenForBuy] = useState<TokenData | null>(null);
   const [showDiagnostics, setShowDiagnostics] = useState<boolean>(false);
 
   return (
-    <div className="min-h-screen cosmic-bg flex flex-col selection:bg-blue-500/30 text-white font-sans">
-      {/* Top Navbar */}
+    <div className="min-h-screen terminal-grid-bg flex flex-col text-[#EDEDEC] font-sans selection:bg-[#C8F031]/30 selection:text-[#0A0B0E]">
+      {/* Top Masthead Navbar */}
       <Navbar />
       <NetworkAlert />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 flex flex-col">
-        {/* HERO SECTION */}
-        <div className="relative text-center py-10 sm:py-16 max-w-4xl mx-auto flex flex-col items-center">
-          {/* Subtle Ambient Cosmic Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-blue-500/10 blur-[140px] rounded-full pointer-events-none" />
-
-          {/* Subtitle Badge */}
-          <div className="inline-flex items-center gap-2 glass-pill px-4 py-1.5 text-xs text-[#8F96A3] mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-            <span>Robinhood Chain Testnet • Algorithmic AMM Curves</span>
-          </div>
-
-          {/* Editorial Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08] mb-6">
-            The Next-Generation <br />
-            <span className="bg-gradient-to-r from-white via-[#b0cdff] to-[#689df8] bg-clip-text text-transparent">
-              Token Launchpad
-            </span>
-          </h1>
-
-          {/* Subheading */}
-          <p className="text-base sm:text-lg text-[#8F96A3] max-w-2xl mb-8 leading-relaxed">
-            Trade instant liquidity bonding curves on Robinhood Chain testnet. Zero rug-pulls, fair launch mechanics, and autonomous graduation to Uniswap v4 pools.
-          </p>
-
-          {/* Minimalist Live Protocol Stats Ribbon */}
-          <div className="w-full max-w-2xl glass-card rounded-2xl p-3 sm:p-4 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 text-left">
-            <div className="p-2.5 rounded-xl bg-[#08090C]/60 border border-white/5">
-              <span className="text-[11px] text-[#8F96A3] block">Network</span>
-              <span className="text-xs font-bold text-emerald-400 font-mono">Chain 46630</span>
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 flex flex-col">
+        {/* TERMINAL PROTOCOL MASTHEAD */}
+        <section className="py-6 sm:py-10 border-b border-[#1E222B] mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-[#161922] border border-[#262C38] text-[11px] font-mono text-[#808593] mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C8F031]" />
+                <span>ROBINHOOD CHAIN TESTNET • ALGORITHMIC AMM PROTOCOL</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-[#EDEDEC] uppercase leading-tight">
+                Robinhood AMM <br />
+                <span className="text-[#C8F031]">Liquidity Terminal</span>
+              </h1>
+              <p className="text-xs sm:text-sm text-[#808593] font-mono mt-3 max-w-xl leading-relaxed">
+                Autonomous bonding curves with continuous deterministic pricing. Upon reaching graduation threshold (0.042 ETH), liquidity auto-migrates to Uniswap v4 pools.
+              </p>
             </div>
-            <div className="p-2.5 rounded-xl bg-[#08090C]/60 border border-white/5">
-              <span className="text-[11px] text-[#8F96A3] block">Launch Fee</span>
-              <span className="text-xs font-bold text-white font-mono">
-                {isFeeLoading ? '...' : `${feeFormatted} ETH`}
-              </span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-[#08090C]/60 border border-white/5">
-              <span className="text-[11px] text-[#8F96A3] block">Multicall3</span>
-              <span className="text-xs font-bold text-blue-400 font-mono">0xcA11...CA11</span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-[#08090C]/60 border border-white/5">
-              <span className="text-[11px] text-[#8F96A3] block">Deploy Block</span>
-              <span className="text-xs font-bold text-white font-mono">#129157568</span>
+
+            {/* Protocol Telemetry Matrix */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+              <div className="p-3 rounded-lg bg-[#111318] border border-[#1E222B]">
+                <span className="text-[10px] text-[#606575] uppercase block">Chain</span>
+                <span className="font-bold text-[#C8F031]">46630 (RHB)</span>
+              </div>
+              <div className="p-3 rounded-lg bg-[#111318] border border-[#1E222B]">
+                <span className="text-[10px] text-[#606575] uppercase block">Launch Fee</span>
+                <span className="font-bold text-[#EDEDEC]">
+                  {isFeeLoading ? '...' : `${feeFormatted || '0.0005'} ETH`}
+                </span>
+              </div>
+              <div className="p-3 rounded-lg bg-[#111318] border border-[#1E222B]">
+                <span className="text-[10px] text-[#606575] uppercase block">Multicall3</span>
+                <span className="font-bold text-[#808593]">0xcA11...CA11</span>
+              </div>
+              <div className="p-3 rounded-lg bg-[#111318] border border-[#1E222B]">
+                <span className="text-[10px] text-[#606575] uppercase block">Deploy Block</span>
+                <span className="font-bold text-[#EDEDEC]">#129157568</span>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* CORE FEATURE: TOKEN LIST (CARDS GRID & FILTERS) */}
-        <TokenList onSelectBuy={(token) => setSelectedTokenForBuy(token)} />
+        {/* CORE FEATURE: TOKEN LIST (CARDS GRID / COMPACT TABLE) */}
+        <section id="tokens">
+          <TokenList onSelectBuy={(token) => setSelectedTokenForBuy(token)} />
+        </section>
 
-        {/* STEP 6: BUY MODAL FORM */}
+        {/* BUY MODAL FORM */}
         <BuyModal
           token={selectedTokenForBuy}
           isOpen={!!selectedTokenForBuy}
@@ -98,21 +93,21 @@ export default function Home() {
         />
 
         {/* TECHNICAL AUDIT & INTERVIEW DIAGNOSTICS ACCORDION */}
-        <div className="mt-16 pt-8 border-t border-white/10">
+        <div className="mt-14 pt-6 border-t border-[#1E222B]">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Terminal className="w-4 h-4 text-purple-400" />
-              <h3 className="text-sm font-bold text-white">
+            <div className="flex items-center gap-2 font-mono text-xs">
+              <Terminal className="w-4 h-4 text-[#C8F031]" />
+              <h3 className="font-bold text-[#EDEDEC] uppercase tracking-wider">
                 Technical Audit & Step Verification Panels
               </h3>
-              <span className="text-[10px] bg-purple-500/10 text-purple-300 border border-purple-500/20 px-2 py-0.5 rounded-full font-semibold">
+              <span className="text-[10px] bg-[#161922] text-[#808593] border border-[#222734] px-1.5 py-0.5 rounded font-mono">
                 Steps 1–4 Proof
               </span>
             </div>
 
             <button
               onClick={() => setShowDiagnostics(!showDiagnostics)}
-              className="text-xs text-[#8F96A3] hover:text-white transition-colors inline-flex items-center gap-1.5 cursor-pointer glass-pill px-3 py-1.5"
+              className="text-xs font-mono text-[#808593] hover:text-[#EDEDEC] transition-colors inline-flex items-center gap-1.5 cursor-pointer px-2.5 py-1 rounded bg-[#111318] border border-[#1E222B]"
             >
               <span>{showDiagnostics ? 'Hide Verification Panels' : 'View Verification Panels'}</span>
               {showDiagnostics ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -120,7 +115,7 @@ export default function Home() {
           </div>
 
           {showDiagnostics && (
-            <div className="space-y-8 pt-4 animate-fadeIn">
+            <div className="space-y-6 pt-2 animate-fadeIn">
               {/* Wallet connection card */}
               <WalletStatusCard />
 
@@ -134,31 +129,31 @@ export default function Home() {
         </div>
       </main>
 
-      {/* FOOTER */}
-      <footer className="w-full border-t border-white/5 py-8 px-4 text-xs text-[#8F96A3] mt-auto">
+      {/* TERMINAL FOOTER */}
+      <footer className="w-full border-t border-[#1E222B] py-6 px-4 sm:px-8 text-xs font-mono text-[#808593] mt-auto bg-[#0A0B0E]">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="font-bold text-white">COINTINENTAL</span>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-[#EDEDEC]">COINTINENTAL</span>
             <span>•</span>
             <span>Robinhood Chain Testnet Launchpad</span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] font-mono">
+          <div className="flex items-center gap-4 text-[11px]">
             <a
               href={`${robinhoodTestnet.blockExplorers.default.url}/address/${LAUNCH_FACTORY_ADDRESS}`}
               target="_blank"
               rel="noreferrer"
-              className="hover:text-white transition-colors inline-flex items-center gap-1"
+              className="hover:text-[#EDEDEC] transition-colors inline-flex items-center gap-1"
             >
               <span>Factory Contract</span>
-              <ArrowUpRight className="w-3 h-3" />
+              <ArrowUpRight className="w-3 h-3 text-[#606575]" />
             </a>
             <span>•</span>
             <a
               href="https://faucet.testnet.chain.robinhood.com/"
               target="_blank"
               rel="noreferrer"
-              className="text-emerald-400 hover:text-emerald-300 transition-colors inline-flex items-center gap-1"
+              className="text-[#C8F031] hover:underline inline-flex items-center gap-1"
             >
               <span>Faucet</span>
               <ArrowUpRight className="w-3 h-3" />

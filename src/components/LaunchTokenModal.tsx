@@ -1,20 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useBalance } from 'wagmi';
 import { robinhoodTestnet } from '@/config/chain';
 import { useLaunchToken } from '@/hooks/useLaunchToken';
+import { useLaunchFee } from '@/hooks/useLaunchFee';
 import { 
   Rocket, 
   X, 
-  Sparkles, 
   AlertCircle, 
   Loader2, 
   CheckCircle2, 
   ExternalLink, 
-  Coins, 
-  TrendingUp, 
-  ShieldCheck,
+  Terminal,
   RotateCcw
 } from 'lucide-react';
 
@@ -26,6 +24,7 @@ interface LaunchTokenModalProps {
 export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
   const { address, isConnected, chainId } = useAccount();
   const { data: balance } = useBalance({ address });
+  const { feeWei, feeFormatted, isLoading: isFeeLoading } = useLaunchFee();
 
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
@@ -51,12 +50,24 @@ export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
     setDescription('');
   });
 
+  // Handle ESC key to close
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen && !isPendingTx && !isAwaitingWallet) {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, isPendingTx, isAwaitingWallet]);
+
   if (!isOpen) return null;
 
   const isWrongNetwork = isConnected && chainId !== robinhoodTestnet.id;
-  const launchFeeWei = BigInt(500000000000000); // 0.0005 ETH
-  const hasInsufficientBalance = balance ? balance.value < launchFeeWei : true;
+  const launchFeeWei = feeWei > 0n ? feeWei : BigInt(500000000000000); // Dynamic with 0.0005 ETH fallback
+  const hasInsufficientBalance = balance ? balance.value < launchFeeWei : false;
   const isValidForm = name.trim().length >= 2 && symbol.trim().length >= 2;
+  const displayFee = isFeeLoading ? '0.0005' : (feeFormatted || '0.0005');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +75,7 @@ export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
 
     executeLaunch({
       name: name.trim(),
-      symbol: symbol.trim(),
+      symbol: symbol.trim().toUpperCase(),
       description: description.trim(),
     });
   };
@@ -76,80 +87,89 @@ export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn overflow-y-auto"
+      onClick={handleClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="launch-token-title"
+    >
       <div 
-        className="w-full max-w-lg glass-card rounded-3xl p-6 sm:p-8 relative border border-white/15 shadow-2xl shadow-blue-500/10 text-left max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-lg bg-[#111318] rounded-xl border border-[#1E222B] p-5 sm:p-6 relative shadow-2xl text-left my-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/10">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-              <Rocket className="w-5 h-5" />
+        {/* Terminal Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-[#1E222B]">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-[#161922] border border-[#262C38] flex items-center justify-center text-[#C8F031] font-mono text-sm">
+              <Terminal className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-white">Launch New Token</h3>
-                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                  Bonus Feature
+                <h3 id="launch-token-title" className="text-base font-bold text-[#EDEDEC] tracking-tight">
+                  Launch New Token
+                </h3>
+                <span className="text-[10px] uppercase font-mono font-bold px-1.5 py-0.5 rounded bg-[#C8F031]/10 text-[#C8F031] border border-[#C8F031]/25">
+                  BONUS
                 </span>
               </div>
-              <p className="text-xs text-[#8F96A3]">Deploy instant bonding curve on Robinhood Testnet</p>
+              <p className="text-xs text-[#808593] font-mono">Deploy bonding curve on Robinhood Testnet</p>
             </div>
           </div>
 
           <button
             onClick={handleClose}
             disabled={isPendingTx || isAwaitingWallet}
-            className="p-1.5 rounded-full hover:bg-white/10 text-[#8F96A3] hover:text-white transition-colors cursor-pointer disabled:opacity-30"
+            className="p-1 rounded-md text-[#808593] hover:text-[#EDEDEC] hover:bg-[#1A1E27] transition-colors cursor-pointer disabled:opacity-30"
+            aria-label="Close modal"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* SUCCESS STATE */}
         {isSuccess && result && (
           <div className="my-6 text-center py-4 space-y-4 animate-scaleUp">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <CheckCircle2 className="w-8 h-8" />
+            <div className="w-14 h-14 rounded-full bg-[#C8F031]/10 border border-[#C8F031]/30 text-[#C8F031] mx-auto flex items-center justify-center">
+              <CheckCircle2 className="w-7 h-7" />
             </div>
 
             <div>
-              <h4 className="text-xl font-extrabold text-white">Token Berhasil Di-Launch! 🎉</h4>
-              <p className="text-xs text-[#8F96A3] mt-1">
-                Token <strong className="text-white">${result.symbol}</strong> ({result.name}) telah aktif di Robinhood Testnet dan langsung muncul di daftar launchpad.
+              <h4 className="text-lg font-bold text-[#EDEDEC]">Token Successfully Launched</h4>
+              <p className="text-xs text-[#808593] mt-1">
+                Token <span className="text-[#EDEDEC] font-mono font-semibold">${result.symbol}</span> ({result.name}) is now live on Robinhood Testnet and indexed in the protocol registry.
               </p>
             </div>
 
             {/* Token & Curve Details Box */}
-            <div className="p-4 rounded-2xl bg-[#0D0F16] border border-white/10 text-left space-y-2.5 text-xs font-mono">
+            <div className="p-3.5 rounded-lg bg-[#0A0B0E] border border-[#1E222B] text-left space-y-2 text-xs font-mono">
               <div>
-                <span className="text-[#8F96A3] block text-[11px]">Token Address:</span>
-                <span className="text-white truncate block">{result.tokenAddress}</span>
+                <span className="text-[#808593] block text-[10px] uppercase tracking-wider">Token Address:</span>
+                <span className="text-[#EDEDEC] truncate block select-all">{result.tokenAddress}</span>
               </div>
               <div>
-                <span className="text-[#8F96A3] block text-[11px]">Bonding Curve Contract:</span>
-                <span className="text-blue-400 truncate block">{result.curveAddress}</span>
+                <span className="text-[#808593] block text-[10px] uppercase tracking-wider">Bonding Curve Contract:</span>
+                <span className="text-[#C8F031] truncate block select-all">{result.curveAddress}</span>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="pt-2 flex flex-col sm:flex-row gap-3">
+            <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
               <a
                 href={`${robinhoodTestnet.blockExplorers.default.url}/tx/${result.txHash}`}
                 target="_blank"
                 rel="noreferrer"
-                className="flex-1 py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white inline-flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 py-2 px-3 rounded-lg bg-[#161922] hover:bg-[#1D212D] border border-[#262C38] text-xs font-mono text-[#EDEDEC] inline-flex items-center justify-center gap-1.5 transition-colors"
               >
                 <span>View on Explorer</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[#8F96A3]" />
+                <ExternalLink className="w-3.5 h-3.5 text-[#808593]" />
               </a>
 
               <button
                 onClick={handleClose}
-                className="flex-1 btn-primary-glow py-2.5 px-4 text-xs font-bold cursor-pointer"
+                className="flex-1 py-2 px-3 rounded-lg bg-[#C8F031] hover:bg-[#D8FF42] text-[#0A0B0E] text-xs font-mono font-bold transition-all cursor-pointer"
               >
-                Lihat di List Token
+                View in Token Registry
               </button>
             </div>
           </div>
@@ -158,18 +178,18 @@ export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
         {/* TRANSACTION IN PROGRESS STATES */}
         {(isAwaitingWallet || isPendingTx) && (
           <div className="my-8 text-center py-6 space-y-4 animate-fadeIn">
-            <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 mx-auto flex items-center justify-center">
-              <Loader2 className="w-8 h-8 animate-spin" />
+            <div className="w-14 h-14 rounded-full bg-[#161922] border border-[#262C38] text-[#C8F031] mx-auto flex items-center justify-center">
+              <Loader2 className="w-7 h-7 animate-spin" />
             </div>
 
             <div>
-              <h4 className="text-base font-bold text-white">
-                {isAwaitingWallet ? 'Menunggu Konfirmasi di Wallet...' : 'Men-deploy Token ke Robinhood Chain...'}
+              <h4 className="text-base font-bold text-[#EDEDEC]">
+                {isAwaitingWallet ? 'Awaiting Wallet Approval...' : 'Broadcasting & Mining Contract...'}
               </h4>
-              <p className="text-xs text-[#8F96A3] mt-1">
+              <p className="text-xs text-[#808593] mt-1 font-mono">
                 {isAwaitingWallet
-                  ? 'Silakan setujui transaksi di jendela ekstensi MetaMask Anda.'
-                  : 'Sedang menunggu transaksi masuk ke blok Robinhood Testnet (~2-4 detik)...'}
+                  ? 'Please confirm the launch transaction in your MetaMask wallet extension.'
+                  : 'Waiting for Robinhood Testnet block inclusion (~2-4s block time)...'}
               </p>
             </div>
 
@@ -178,9 +198,9 @@ export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
                 href={`${robinhoodTestnet.blockExplorers.default.url}/tx/${txHash}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-mono text-[#C8F031] hover:underline"
               >
-                <span>Lihat proses mining transaksi</span>
+                <span>Track transaction on Explorer</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             )}
@@ -189,25 +209,25 @@ export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
 
         {/* ERROR OR REJECTED BANNER */}
         {(isRejected || isError) && (
-          <div className="my-4 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-300">
+          <div className="my-4 p-3.5 rounded-lg bg-[#1C1316] border border-[#3E1C22] text-xs text-rose-300">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <strong className="block text-white font-semibold">
-                    {isRejected ? 'Transaksi Dibatalkan di Wallet' : 'Gagal Melakukan Launch Token'}
+                  <strong className="block text-[#EDEDEC] font-semibold">
+                    {isRejected ? 'Transaction Rejected by User' : 'Token Deployment Failed'}
                   </strong>
-                  <p className="mt-0.5 text-rose-200">
-                    {parsedError?.message || 'Terjadi kesalahan saat memproses transaksi.'}
+                  <p className="mt-0.5 text-rose-300/80 font-mono text-[11px]">
+                    {parsedError?.message || 'An unexpected error occurred while processing transaction.'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={reset}
-                className="p-1 rounded-lg hover:bg-rose-500/20 text-rose-300 cursor-pointer"
-                title="Coba lagi"
+                className="p-1 rounded text-rose-300 hover:bg-rose-500/20 cursor-pointer"
+                title="Retry launch"
               >
-                <RotateCcw className="w-4 h-4" />
+                <RotateCcw className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -218,76 +238,80 @@ export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             {/* Token Name Input */}
             <div>
-              <label className="block text-xs font-semibold text-[#8F96A3] mb-1.5">
-                Token Name <span className="text-rose-400">*</span>
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-[#808593] mb-1.5">
+                Token Name <span className="text-[#C8F031]">*</span>
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="misal: Sander Token, Adatama Moon"
+                placeholder="e.g. Sander Token, Sovereign Yield"
                 maxLength={32}
                 required
-                className="w-full px-4 py-2.5 rounded-xl bg-[#08090C] border border-white/10 text-white text-sm focus:outline-none focus:border-blue-400/50 transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-lg bg-[#0A0B0E] border border-[#1E222B] text-[#EDEDEC] text-xs font-mono placeholder:text-[#4A5060] focus:outline-none focus:border-[#C8F031] transition-colors"
               />
             </div>
 
             {/* Token Symbol Input */}
             <div>
-              <label className="block text-xs font-semibold text-[#8F96A3] mb-1.5">
-                Symbol / Ticker <span className="text-rose-400">*</span>
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-[#808593] mb-1.5">
+                Symbol / Ticker <span className="text-[#C8F031]">*</span>
               </label>
               <input
                 type="text"
                 value={symbol}
                 onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-                placeholder="misal: SNDR, ADTM, ROBIN"
+                placeholder="e.g. SNDR, SVY, RHB"
                 maxLength={8}
                 required
-                className="w-full px-4 py-2.5 rounded-xl bg-[#08090C] border border-white/10 text-white text-sm font-mono uppercase focus:outline-none focus:border-blue-400/50 transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-lg bg-[#0A0B0E] border border-[#1E222B] text-[#EDEDEC] text-xs font-mono uppercase placeholder:text-[#4A5060] focus:outline-none focus:border-[#C8F031] transition-colors"
               />
             </div>
 
             {/* Description Input */}
             <div>
-              <label className="block text-xs font-semibold text-[#8F96A3] mb-1.5">
-                Deskripsi Token <span className="text-[#8F96A3] font-normal">(opsional)</span>
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-[#808593] mb-1.5">
+                Description <span className="text-[#4A5060] lowercase">(optional)</span>
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Jelaskan visi atau fungsi token uji Anda..."
+                placeholder="Brief summary of token utility or experiment..."
                 rows={2}
                 maxLength={140}
-                className="w-full px-4 py-2 rounded-xl bg-[#08090C] border border-white/10 text-white text-xs focus:outline-none focus:border-blue-400/50 transition-colors resize-none"
+                className="w-full px-3.5 py-2 rounded-lg bg-[#0A0B0E] border border-[#1E222B] text-[#EDEDEC] text-xs font-mono placeholder:text-[#4A5060] focus:outline-none focus:border-[#C8F031] transition-colors resize-none"
               />
             </div>
 
             {/* Protocol Economics Blueprint Info Box */}
-            <div className="p-4 rounded-2xl bg-[#0D0F16] border border-white/5 space-y-2 text-xs">
-              <div className="flex items-center justify-between text-[#8F96A3]">
-                <span>Total Token Supply:</span>
-                <span className="font-semibold text-white font-mono">1,000,000,000 Tokens</span>
+            <div className="p-3.5 rounded-lg bg-[#0A0B0E] border border-[#1E222B] space-y-2 text-xs font-mono">
+              <div className="flex items-center justify-between text-[#808593]">
+                <span className="text-[11px]">Total Supply:</span>
+                <span className="text-[#EDEDEC] font-bold">1,000,000,000 Tokens</span>
               </div>
-              <div className="flex items-center justify-between text-[#8F96A3]">
-                <span>Starting Spot Price:</span>
-                <span className="font-semibold text-emerald-400 font-mono">0.0₁₀1680 ETH</span>
+              <div className="flex items-center justify-between text-[#808593]">
+                <span className="text-[11px]">Starting Spot Price:</span>
+                <span className="text-[#C8F031] font-bold">0.0₁₀1680 ETH</span>
               </div>
-              <div className="flex items-center justify-between text-[#8F96A3]">
-                <span>Graduation Target:</span>
-                <span className="font-semibold text-purple-400 font-mono">0.042 ETH → Uniswap v4</span>
+              <div className="flex items-center justify-between text-[#808593]">
+                <span className="text-[11px]">Graduation Target:</span>
+                <span className="text-[#808593] text-right font-bold">
+                  <span className="text-[#EDEDEC]">0.042 ETH</span> → Uniswap v4
+                </span>
               </div>
-              <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
-                <span className="font-bold text-white">Required Launch Fee:</span>
-                <span className="font-bold text-blue-400 font-mono">0.0005 ETH</span>
+              <div className="pt-2 border-t border-[#1E222B] flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#EDEDEC]">Required Launch Fee:</span>
+                <span className="font-bold text-[#C8F031]">
+                  {isFeeLoading ? 'Loading...' : `${displayFee} ETH`}
+                </span>
               </div>
             </div>
 
             {/* Warning if insufficient balance */}
             {hasInsufficientBalance && (
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 flex items-center gap-2">
+              <div className="p-3 rounded-lg bg-[#241B0E] border border-[#443118] text-[11px] text-amber-300 font-mono flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                <span>Saldo Anda tidak mencukupi untuk launch fee (0.0005 ETH).</span>
+                <span>Insufficient wallet balance to cover the launch fee ({displayFee} ETH).</span>
               </div>
             )}
 
@@ -295,10 +319,10 @@ export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
             <button
               type="submit"
               disabled={!isValidForm || !isConnected || isWrongNetwork || hasInsufficientBalance}
-              className="w-full btn-primary-glow py-3 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed mt-2"
+              className="w-full py-2.5 rounded-lg bg-[#C8F031] hover:bg-[#D8FF42] text-[#0A0B0E] font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed mt-2"
             >
               <Rocket className="w-4 h-4" />
-              <span>Launch Token on Robinhood Chain (0.0005 ETH)</span>
+              <span>Launch Token on Robinhood Chain ({displayFee} ETH)</span>
             </button>
           </form>
         )}

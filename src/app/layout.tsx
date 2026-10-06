@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cointinental — Next-Gen Web3 Token Launchpad",
-  description: "Trade bonding curve tokens on Robinhood Chain Testnet with decentralized graduation mechanics.",
+  title: "COINTINENTAL — Robinhood Chain Algorithmic AMM Terminal",
+  description: "Industrial-grade Web3 AMM bonding curve terminal on Robinhood Chain Testnet with autonomous graduation to Uniswap v4 pools.",
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#08090C] text-white">
+      <body className="min-h-full flex flex-col bg-[#0A0B0E] text-[#EDEDEC]">
         <Providers>{children}</Providers>
       </body>
     </html>
