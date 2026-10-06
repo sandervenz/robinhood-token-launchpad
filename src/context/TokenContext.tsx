@@ -14,6 +14,8 @@ interface TokenContextType {
   refetchTokens: () => Promise<void>;
   handlePurchaseSuccess: (tokenAddress: string) => Promise<void>;
   lastPurchasedAddress: string | null;
+  phaseFilter: 'all' | '0' | '2';
+  setPhaseFilter: (phase: 'all' | '0' | '2') => void;
 }
 
 const TokenContext = createContext<TokenContextType | undefined>(undefined);
@@ -22,6 +24,7 @@ export function TokenProvider({ children }: { children: ReactNode }) {
   const tokenData = useTokenData();
   const queryClient = useQueryClient();
   const [lastPurchasedAddress, setLastPurchasedAddress] = useState<string | null>(null);
+  const [phaseFilter, setPhaseFilter] = useState<'all' | '0' | '2'>('all');
 
   const handlePurchaseSuccess = useCallback(
     async (tokenAddress: string) => {
@@ -52,6 +55,8 @@ export function TokenProvider({ children }: { children: ReactNode }) {
         refetchTokens: tokenData.refetch,
         handlePurchaseSuccess,
         lastPurchasedAddress,
+        phaseFilter,
+        setPhaseFilter,
       }}
     >
       {children}

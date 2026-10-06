@@ -21,10 +21,19 @@ interface TokenListProps {
 }
 
 export function TokenList({ onSelectBuy }: TokenListProps) {
-  const { tokens, isLoading, isRefreshing, isError, error, refetchTokens: refetch, lastPurchasedAddress } = useTokens();
+  const { 
+    tokens, 
+    isLoading, 
+    isRefreshing, 
+    isError, 
+    error, 
+    refetchTokens: refetch, 
+    lastPurchasedAddress,
+    phaseFilter,
+    setPhaseFilter 
+  } = useTokens();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPhase, setSelectedPhase] = useState<'all' | '0' | '2'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'progress' | 'name'>('newest');
 
   // Filtered & Sorted Tokens
@@ -32,7 +41,7 @@ export function TokenList({ onSelectBuy }: TokenListProps) {
     return tokens
       .filter((t) => {
         // Filter by phase
-        if (selectedPhase !== 'all' && t.phase.toString() !== selectedPhase) {
+        if (phaseFilter !== 'all' && t.phase.toString() !== phaseFilter) {
           return false;
         }
 
@@ -55,7 +64,7 @@ export function TokenList({ onSelectBuy }: TokenListProps) {
         // default newest (by block number descending)
         return Number(b.blockNumber - a.blockNumber);
       });
-  }, [tokens, searchQuery, selectedPhase, sortBy]);
+  }, [tokens, searchQuery, phaseFilter, sortBy]);
 
   // Phase Counts
   const counts = useMemo(() => {
@@ -66,7 +75,7 @@ export function TokenList({ onSelectBuy }: TokenListProps) {
   }, [tokens]);
 
   return (
-    <section className="w-full max-w-7xl mx-auto my-8">
+    <section id="tokens" className="w-full max-w-7xl mx-auto my-8 scroll-mt-24">
       {/* Section Header & Search Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
@@ -101,9 +110,9 @@ export function TokenList({ onSelectBuy }: TokenListProps) {
         {/* Phase Filter Tabs */}
         <div className="inline-flex p-1 rounded-full bg-[#0D0F16] border border-white/5 text-xs text-[#8F96A3] self-start sm:self-auto overflow-x-auto">
           <button
-            onClick={() => setSelectedPhase('all')}
+            onClick={() => setPhaseFilter('all')}
             className={`px-3.5 py-1.5 rounded-full font-medium transition-all cursor-pointer ${
-              selectedPhase === 'all'
+              phaseFilter === 'all'
                 ? 'bg-white/10 text-white shadow-sm'
                 : 'hover:text-white'
             }`}
@@ -111,9 +120,9 @@ export function TokenList({ onSelectBuy }: TokenListProps) {
             All Tokens ({counts.total})
           </button>
           <button
-            onClick={() => setSelectedPhase('0')}
+            onClick={() => setPhaseFilter('0')}
             className={`px-3.5 py-1.5 rounded-full font-medium transition-all cursor-pointer ${
-              selectedPhase === '0'
+              phaseFilter === '0'
                 ? 'bg-emerald-500/20 text-emerald-300 shadow-sm'
                 : 'hover:text-white'
             }`}
@@ -121,9 +130,9 @@ export function TokenList({ onSelectBuy }: TokenListProps) {
             Active Curves ({counts.active})
           </button>
           <button
-            onClick={() => setSelectedPhase('2')}
+            onClick={() => setPhaseFilter('2')}
             className={`px-3.5 py-1.5 rounded-full font-medium transition-all cursor-pointer ${
-              selectedPhase === '2'
+              phaseFilter === '2'
                 ? 'bg-purple-500/20 text-purple-300 shadow-sm'
                 : 'hover:text-white'
             }`}
