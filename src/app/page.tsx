@@ -1,32 +1,34 @@
 'use client';
 
 import { Navbar } from '@/components/Navbar';
+import { NetworkAlert } from '@/components/NetworkAlert';
+import { WalletStatusCard } from '@/components/WalletStatusCard';
 import { useLaunchFee } from '@/hooks/useLaunchFee';
 import { 
   LAUNCH_FACTORY_ADDRESS, 
-  MULTICALL3_ADDRESS, 
   FACTORY_DEPLOY_BLOCK 
 } from '@/config/contracts';
 import { robinhoodTestnet } from '@/config/chain';
-import { ArrowUpRight, Cpu, Layers, Shield, Zap, CheckCircle2 } from 'lucide-react';
+import { ArrowUpRight, Zap, CheckCircle2 } from 'lucide-react';
 
 export default function Home() {
-  const { feeFormatted, feeWei, isLoading, isError, error, refetch } = useLaunchFee();
+  const { feeFormatted, feeWei, isLoading, isError, refetch } = useLaunchFee();
 
   return (
     <div className="min-h-screen cosmic-bg flex flex-col selection:bg-blue-500/30">
       <Navbar />
+      <NetworkAlert />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-10 flex flex-col justify-between">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 flex flex-col justify-between">
         {/* Hero Section */}
-        <div className="relative my-auto flex flex-col items-center text-center py-12">
+        <div className="relative my-auto flex flex-col items-center text-center py-8">
           {/* Subtle Glow Behind Hero */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-blue-500/15 blur-[120px] rounded-full pointer-events-none" />
 
           {/* Pill Badge */}
           <div className="inline-flex items-center gap-2 glass-pill px-4 py-1.5 text-xs text-[#8F96A3] mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-            <span>Robinhood Chain Testnet • Step 1 Initialized</span>
+            <span>Robinhood Chain Testnet • Step 2 Initialized</span>
           </div>
 
           {/* Heading */}
@@ -38,11 +40,14 @@ export default function Home() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base sm:text-lg text-[#8F96A3] max-w-2xl mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg text-[#8F96A3] max-w-2xl mb-8 leading-relaxed">
             Fair token launches with zero initial liquidity required. Every token is traded on an automated bonding curve until reaching graduation threshold for Uniswap v4.
           </p>
 
-          {/* Step 1 Completion Feature Card (Launch Fee Verified) */}
+          {/* Step 2: Wallet Connection & Balance Card */}
+          <WalletStatusCard />
+
+          {/* Step 1: Protocol & Factory Verification Card */}
           <div className="w-full max-w-3xl glass-card rounded-2xl p-6 sm:p-8 relative overflow-hidden text-left mb-10">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
               <div className="flex items-center gap-3">
@@ -136,7 +141,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="w-full border-t border-white/5 py-6 px-4 text-center text-xs text-[#8F96A3]">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span>Cointinental Launchpad — Robinhood Chain Testnet (Phase 1 Completed)</span>
+          <span>Cointinental Launchpad — Robinhood Chain Testnet (Phase 2 Completed)</span>
           <div className="flex items-center gap-4 text-[11px]">
             <span>Next.js 15+</span>
             <span>•</span>
