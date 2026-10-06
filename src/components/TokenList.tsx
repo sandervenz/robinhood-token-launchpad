@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useTokenData } from '@/hooks/useTokenData';
+import { useTokens } from '@/context/TokenContext';
 import { TokenData, TokenPhase } from '@/types/token';
 import { TokenCard } from './TokenCard';
 import { 
@@ -21,7 +21,7 @@ interface TokenListProps {
 }
 
 export function TokenList({ onSelectBuy }: TokenListProps) {
-  const { tokens, isLoading, isRefreshing, isError, error, refetch } = useTokenData();
+  const { tokens, isLoading, isRefreshing, isError, error, refetchTokens: refetch, lastPurchasedAddress } = useTokens();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPhase, setSelectedPhase] = useState<'all' | '0' | '2'>('all');
@@ -237,6 +237,7 @@ export function TokenList({ onSelectBuy }: TokenListProps) {
             <TokenCard
               key={token.token}
               token={token}
+              isHighlighted={lastPurchasedAddress === token.token.toLowerCase()}
               onSelectBuy={onSelectBuy}
             />
           ))}

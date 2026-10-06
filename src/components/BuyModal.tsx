@@ -26,6 +26,8 @@ import {
   RotateCcw
 } from 'lucide-react';
 
+import { useTokens } from '@/context/TokenContext';
+
 interface BuyModalProps {
   token: TokenData | null;
   isOpen: boolean;
@@ -37,6 +39,7 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
   const { address, isConnected, chainId } = useAccount();
   const { switchChain } = useSwitchChain();
   const { data: ethBalance, refetch: refetchEthBalance } = useBalance({ address });
+  const { handlePurchaseSuccess } = useTokens();
 
   // Read user's token balance
   const { data: userTokenBalance, refetch: refetchTokenBalance } = useReadContract({
@@ -55,9 +58,12 @@ export function BuyModal({ token, isOpen, onClose, onSuccessRefresh }: BuyModalP
   const [slippageBps, setSlippageBps] = useState<bigint>(BigInt(100)); // 100 bps
 
   // Buy hook with auto-refresh callback for Step 8
-  const { state: txState, txHash, result: txResult, error: txError, executeBuy, resetState, isBusy } = useBuyToken(() => {
+  const { state: txState, txHash, result: txResult, error: txError, executeBuy, resetState, isBusy } = useBuyToken(async () => {
     refetchEthBalance();
     refetchTokenBalance();
+    if (token) {
+      await handlePurchaseSuccess(token.token);
+    }
     if (onSuccessRefresh) onSuccessRefresh();
   });
 
