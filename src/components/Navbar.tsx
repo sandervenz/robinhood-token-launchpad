@@ -1,7 +1,8 @@
 'use client';
 
 import { useLaunchFee } from '@/hooks/useLaunchFee';
-import { Sparkles, Activity, ShieldCheck } from 'lucide-react';
+import { Sparkles, Activity } from 'lucide-react';
+import { WalletButton } from './WalletButton';
 
 export function Navbar() {
   const { feeFormatted, isLoading, isError } = useLaunchFee();
@@ -26,7 +27,7 @@ export function Navbar() {
         </div>
 
         {/* Center: Floating Pill Navigation */}
-        <nav className="hidden md:flex items-center gap-6 glass-pill px-6 py-2 text-sm text-[#8F96A3]">
+        <nav className="hidden lg:flex items-center gap-6 glass-pill px-6 py-2 text-sm text-[#8F96A3]">
           <span className="text-white font-medium cursor-pointer transition-colors">
             Explore Tokens
           </span>
@@ -38,10 +39,10 @@ export function Navbar() {
           </span>
         </nav>
 
-        {/* Right: Network Status & Launch Fee Badge */}
+        {/* Right: Launch Fee & Wallet Controls */}
         <div className="flex items-center gap-3">
           {/* Launch Fee Pill */}
-          <div className="flex items-center gap-2 glass-pill px-3.5 py-1.5 text-xs text-[#8F96A3]">
+          <div className="hidden md:flex items-center gap-2 glass-pill px-3.5 py-1.5 text-xs text-[#8F96A3]">
             <Activity className="w-3.5 h-3.5 text-blue-400" />
             <span>Launch Fee:</span>
             {isLoading ? (
@@ -55,11 +56,8 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Chain Badge */}
-          <div className="hidden sm:flex items-center gap-1.5 glass-pill px-3 py-1.5 text-xs text-emerald-400 border-emerald-500/20 bg-emerald-500/5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-medium">Robinhood 46630</span>
-          </div>
+          {/* Connect / User Account Button */}
+          <WalletButton />
         </div>
       </div>
     </header>
