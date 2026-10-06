@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useConnect, useAccount } from 'wagmi';
 import { 
   Wallet, 
@@ -24,8 +25,10 @@ export function ConnectModal({ isOpen, onClose }: ConnectModalProps) {
   const [hasEthereum, setHasEthereum] = useState<boolean>(true);
   const [activeConnectorId, setActiveConnectorId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window !== 'undefined') {
       setHasEthereum(!!(window as any).ethereum);
     }
@@ -49,7 +52,7 @@ export function ConnectModal({ isOpen, onClose }: ConnectModalProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, isPending, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const handleConnect = async (connector: any) => {
     setActiveConnectorId(connector.id);
@@ -72,7 +75,7 @@ export function ConnectModal({ isOpen, onClose }: ConnectModalProps) {
     }
   };
 
-  return (
+  return createPortal(
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn"
       onClick={onClose}
@@ -187,6 +190,7 @@ export function ConnectModal({ isOpen, onClose }: ConnectModalProps) {
           If the popup window does not appear, check the fox icon 🦊 in your browser toolbar to approve.
         </p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

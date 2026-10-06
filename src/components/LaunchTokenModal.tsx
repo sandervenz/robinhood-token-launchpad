@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAccount, useBalance } from 'wagmi';
 import { robinhoodTestnet } from '@/config/chain';
 import { useLaunchToken } from '@/hooks/useLaunchToken';
@@ -61,7 +62,10 @@ export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, isPendingTx, isAwaitingWallet]);
 
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!isOpen || !mounted) return null;
 
   const isWrongNetwork = isConnected && chainId !== robinhoodTestnet.id;
   const launchFeeWei = feeWei > 0n ? feeWei : BigInt(500000000000000); // Dynamic with 0.0005 ETH fallback
@@ -86,16 +90,16 @@ export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
     onClose();
   };
 
-  return (
+  return createPortal(
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn"
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="launch-token-title"
     >
       <div 
-        className="w-full max-w-lg bg-[#111318] rounded-xl border border-[#1E222B] p-5 sm:p-6 relative shadow-2xl text-left my-auto"
+        className="w-full max-w-lg bg-[#111318] rounded-xl border border-[#1E222B] p-6 sm:p-7 relative shadow-2xl text-left max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Terminal Header */}
@@ -327,6 +331,7 @@ export function LaunchTokenModal({ isOpen, onClose }: LaunchTokenModalProps) {
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

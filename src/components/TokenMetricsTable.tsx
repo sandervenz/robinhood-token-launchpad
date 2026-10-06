@@ -130,14 +130,15 @@ export function TokenMetricsTable() {
                   {/* Token Asset (Logo + Name + Symbol) */}
                   <td className="py-2.5 px-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-md bg-[#161922] border border-[#262C38] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <div className="w-7 h-7 min-w-[28px] max-w-[28px] min-h-[28px] max-h-[28px] rounded-md bg-[#161922] border border-[#262C38] flex items-center justify-center flex-shrink-0 overflow-hidden">
                         {t.logo && t.logo.startsWith('http') ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img 
                             src={t.logo} 
                             alt={t.symbol} 
-                            className="w-full h-full object-cover"
+                            className="w-7 h-7 max-w-[28px] max-h-[28px] object-cover flex-shrink-0"
                             onError={(e) => {
+                              // Fallback on image error
                               (e.target as HTMLElement).style.display = 'none';
                             }}
                           />
