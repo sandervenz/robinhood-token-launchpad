@@ -19,10 +19,10 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 w-full px-4 sm:px-8 pt-4 pb-2">
-      <div className="max-w-7xl mx-auto relative flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-[1fr_auto_1fr] items-center gap-4">
         {/* Left: Brand */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1c2333] to-[#0d111a] border border-white/10 flex items-center justify-center shadow-lg shadow-blue-500/10">
+        <div className="flex items-center gap-3 justify-self-start">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1c2333] to-[#0d111a] border border-white/10 flex items-center justify-center shadow-lg shadow-blue-500/10 flex-shrink-0">
             <Sparkles className="w-5 h-5 text-blue-400" />
           </div>
           <div>
@@ -36,11 +36,11 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Center: Perfectly Centered Floating Pill Navigation */}
-        <nav className="hidden lg:flex items-center gap-1 glass-pill p-1 text-xs text-[#8F96A3] absolute left-1/2 -translate-x-1/2 shadow-xl shadow-black/40 border border-white/10">
+        {/* Center: Perfectly Centered Floating Pill Navigation (No Collision) */}
+        <nav className="hidden lg:flex items-center gap-1 glass-pill p-1 text-xs text-[#8F96A3] justify-self-center shadow-xl shadow-black/40 border border-white/10">
           <button
             onClick={() => handleNavClick('all')}
-            className={`px-4 py-1.5 rounded-full font-semibold transition-all cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
               phaseFilter === 'all'
                 ? 'bg-white/15 text-white shadow-sm'
                 : 'text-[#8F96A3] hover:text-white hover:bg-white/5'
@@ -50,7 +50,7 @@ export function Navbar() {
           </button>
           <button
             onClick={() => handleNavClick('0')}
-            className={`px-4 py-1.5 rounded-full font-semibold transition-all cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
               phaseFilter === '0'
                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm'
                 : 'text-[#8F96A3] hover:text-white hover:bg-white/5'
@@ -60,7 +60,7 @@ export function Navbar() {
           </button>
           <button
             onClick={() => handleNavClick('2')}
-            className={`px-4 py-1.5 rounded-full font-semibold transition-all cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
               phaseFilter === '2'
                 ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30 shadow-sm'
                 : 'text-[#8F96A3] hover:text-white hover:bg-white/5'
@@ -70,18 +70,18 @@ export function Navbar() {
           </button>
         </nav>
 
-        {/* Right: Launch Fee & Wallet Controls */}
-        <div className="flex items-center gap-3">
-          {/* Launch Fee Pill */}
-          <div className="hidden md:flex items-center gap-2 glass-pill px-3.5 py-1.5 text-xs text-[#8F96A3]">
+        {/* Right: Wallet Controls & Optional Launch Fee */}
+        <div className="flex items-center gap-2.5 justify-self-end">
+          {/* Launch Fee Pill (Only visible on wide screens to prevent any overlap) */}
+          <div className="hidden xl:flex items-center gap-2 glass-pill px-3 py-1.5 text-xs text-[#8F96A3]">
             <Activity className="w-3.5 h-3.5 text-blue-400" />
             <span>Launch Fee:</span>
             {isLoading ? (
-              <span className="text-gray-400 animate-pulse">Loading...</span>
+              <span className="text-gray-400 animate-pulse">...</span>
             ) : isError ? (
               <span className="text-rose-400">Error</span>
             ) : (
-              <span className="font-semibold text-white">
+              <span className="font-semibold text-white font-mono">
                 {feeFormatted} ETH
               </span>
             )}
